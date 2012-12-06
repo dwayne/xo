@@ -10,6 +10,12 @@ module TicTacToe
       @grid = Array.new(ROWS * COLS, :e)
     end
 
+    def clone
+      g = Grid.new
+      g.instance_variable_set :@grid, @grid.clone
+      g
+    end
+
     def [](r, c)
       if Grid.contains?(r, c)
         @grid[idx r, c]
