@@ -62,6 +62,17 @@ module TicTacToe
       @grid.join('')
     end
 
+    # returns a string formatted to look like a grid when it's printed
+    def pretty_print
+      [
+        " #{@grid[0]} | #{@grid[1]} | #{@grid[2]} ",
+        "---+---+---",
+        " #{@grid[3]} | #{@grid[4]} | #{@grid[5]} ",
+        "---+---+---",
+        " #{@grid[6]} | #{@grid[7]} | #{@grid[8]} "
+      ].join("\n")
+    end
+
     def self.contains?(r, c)
       r.between?(1, ROWS) and c.between?(1, COLS)
     end
