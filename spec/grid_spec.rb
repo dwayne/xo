@@ -94,7 +94,55 @@ describe TicTacToe::Grid do
     end
 
     describe "how status works" do
-      # TODO
+
+      describe ":game_in_progress" do
+        it "returns :game_in_progress for an empty grid" do
+          @grid.xstatus.must_be :==, { kind: :ok, type: :game_in_progress }
+          @grid.ostatus.must_be :==, { kind: :ok, type: :game_in_progress }
+        end
+
+        it "returns :game_in_progress for an equal amount of both tokens in a non-winning position" do
+          @grid.putx(1, 1).putx(1, 2).puto(2, 1).puto(2, 2)
+          @grid.xstatus.must_be :==, { kind: :ok, type: :game_in_progress }
+          @grid.ostatus.must_be :==, { kind: :ok, type: :game_in_progress }
+        end
+
+        it "returns :game_in_progress whenever the token count is ahead by one for any of the tokens" do
+          @grid.putx(1, 1).puto(2, 2).putx(3, 3)
+          @grid.xstatus.must_be :==, { kind: :ok, type: :game_in_progress }
+
+          @grid.clear_all.puto(1, 3).putx(2, 2).puto(3, 1)
+          @grid.ostatus.must_be :==, { kind: :ok, type: :game_in_progress }
+        end
+      end
+
+      describe ":game_over" do
+        it "is a squashed game whenever all the cells are filled and their is no winner" do
+          @grid.putx(1, 1).puto(2, 2).putx(3, 3).puto(2, 1).putx(2, 3).puto(1, 3).putx(3, 1).puto(3, 2).putx(1, 2)
+          @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :squashed }
+        end
+
+        describe "winning positions" do
+          # TODO
+        end
+      end
+
+      describe "error conditions" do
+        it "returns :did_not_make_last_move when the token used to get the status could not have been the last to be placed on the grid" do
+          @grid.putx 1, 1
+          @grid.ostatus.must_be :==, { kind: :error, type: :did_not_make_last_move }
+        end
+
+        it "returns :illegal_configuration whenever the token count is ahead by two or more for any of the tokens" do
+          @grid.putx(1, 1).putx(2, 3)
+          @grid.xstatus.must_be :==, { kind: :error, type: :illegal_configuration }
+          @grid.ostatus.must_be :==, { kind: :error, type: :illegal_configuration }
+
+          @grid.puto(3, 1).puto(3, 2).puto(3, 3).puto(2, 2)
+          @grid.xstatus.must_be :==, { kind: :error, type: :illegal_configuration }
+          @grid.ostatus.must_be :==, { kind: :error, type: :illegal_configuration }
+        end
+      end
     end
   end
 end
