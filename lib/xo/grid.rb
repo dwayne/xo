@@ -111,7 +111,7 @@ module TicTacToe
           { kind: :ok, type: :game_over, reason: :win, details: winning_positions }
         end
       else
-        { kind: :error, reason: xo.abs > 1 ? :illegal_configuration : :did_not_make_last_move }
+        { kind: :error, type: xo.abs > 1 ? :illegal_configuration : :did_not_make_last_move }
       end
     end
 

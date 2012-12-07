@@ -53,7 +53,7 @@ module TicTacToe
           elsif status[:kind] == :error
             # we should never reach here since we
             # are enforcing the rules of the game
-            raise InternalLogicError, status[:reason]
+            raise InternalLogicError, status[:type]
           else # unknown kind
             # assuming the Grid class is implemented correctly,
             # we should never reach here
