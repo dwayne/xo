@@ -123,7 +123,79 @@ describe TicTacToe::Grid do
         end
 
         describe "winning positions" do
-          # TODO
+          it "is a win in the first row" do
+            @grid.putx(1, 1).puto(2, 1).putx(1, 2).puto(2, 2).putx(1, 3)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ row: 1 }] }
+
+            @grid.clear_all.puto(1, 1).putx(2, 1).puto(1, 2).putx(2, 2).puto(1, 3)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ row: 1 }] }
+          end
+
+          it "is a win in the second row" do
+            @grid.putx(2, 1).puto(1, 1).putx(2, 2).puto(1, 2).putx(2, 3)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ row: 2 }] }
+
+            @grid.clear_all.puto(2, 1).putx(1, 1).puto(2, 2).putx(1, 2).puto(2, 3)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ row: 2 }] }
+          end
+
+          it "is a win in the third row" do
+            @grid.putx(3, 1).puto(2, 1).putx(3, 2).puto(2, 2).putx(3, 3)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ row: 3 }] }
+
+            @grid.clear_all.puto(3, 1).putx(2, 1).puto(3, 2).putx(2, 2).puto(3, 3)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ row: 3 }] }
+          end
+
+          it "is a win in the first column" do
+            @grid.putx(1, 1).puto(1, 2).putx(2, 1).puto(2, 2).putx(3, 1)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ col: 1 }] }
+
+            @grid.clear_all.puto(1, 1).putx(1, 2).puto(2, 1).putx(2, 2).puto(3, 1)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ col: 1 }] }
+          end
+
+          it "is a win in the second column" do
+            @grid.putx(1, 2).puto(1, 1).putx(2, 2).puto(2, 1).putx(3, 2)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ col: 2 }] }
+
+            @grid.clear_all.puto(1, 2).putx(1, 1).puto(2, 2).putx(2, 1).puto(3, 2)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ col: 2 }] }
+          end
+
+          it "is a win in the third column" do
+            @grid.putx(1, 3).puto(2, 1).putx(2, 3).puto(2, 2).putx(3, 3)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ col: 3 }] }
+
+            @grid.clear_all.puto(1, 3).putx(2, 1).puto(2, 3).putx(2, 2).puto(3, 3)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ col: 3 }] }
+          end
+
+          it "is a win in the first diagonal" do
+            @grid.putx(1, 1).puto(1, 2).putx(2, 2).puto(2, 1).putx(3, 3)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ diag: 1 }] }
+
+            @grid.clear_all.puto(1, 1).putx(1, 2).puto(2, 2).putx(2, 1).puto(3, 3)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ diag: 1 }] }
+          end
+
+          it "is a win in the second diagonal" do
+            @grid.putx(1, 3).puto(2, 1).putx(2, 2).puto(2, 3).putx(3, 1)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ diag: 2 }] }
+
+            @grid.clear_all.puto(1, 3).putx(2, 1).puto(2, 2).putx(2, 3).puto(3, 1)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ diag: 2 }] }
+          end
+
+          it "is a win in both diagonals" do
+            @grid.putx(1, 1).puto(1, 2).putx(1, 3).puto(2, 1).putx(2, 2).puto(2, 3).putx(3, 1).puto(3, 2).putx(3, 3)
+            @grid.xstatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ diag: 1 }, { diag: 2 }]}
+
+            @grid.puto(1, 1).putx(1, 2).puto(1, 3).putx(2, 1).puto(2, 2).putx(2, 3).puto(3, 1).putx(3, 2).puto(3, 3)
+            @grid.ostatus.must_be :==, { kind: :ok, type: :game_over, reason: :win, details: [{ diag: 1 }, { diag: 2 }]}
+          end
+
+          # TODO: Test double wins in row r and column c
         end
       end
 
