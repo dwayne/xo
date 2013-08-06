@@ -1,1 +1,2 @@
-require 'xo/engine'
+require 'xo/board'
+require 'xo/referee'
