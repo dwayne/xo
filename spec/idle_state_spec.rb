@@ -1,5 +1,8 @@
 require_relative 'spec_helper'
+require_relative '../lib/xo/engine'
 require_relative '../lib/xo/idle_state'
+
+require 'ostruct'
 
 module TTT
 

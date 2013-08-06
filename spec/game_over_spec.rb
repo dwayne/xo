@@ -1,5 +1,8 @@
 require_relative 'spec_helper'
-require_relative '../lib/xo/idle_state'
+require_relative '../lib/xo/engine'
+require_relative '../lib/xo/game_over_state'
+
+require 'ostruct'
 
 module TTT
 
