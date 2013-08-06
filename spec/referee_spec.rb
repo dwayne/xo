@@ -40,6 +40,16 @@ module TTT
           status[:event].must_equal :game_still_in_progress
         end
 
+        it 'returns :game_still_in_progress for the configuration [:x, :e, :o, :e, :o, :x, :e, :e, :e]' do
+          @board[1, 1] = :x
+          @board[1, 3] = :o
+          @board[2, 2] = :o
+          @board[2, 3] = :x
+
+          status = @referee.check_status(:o)
+          status[:event].must_equal :game_still_in_progress
+        end
+
         describe 'winning positions' do
 
           it 'returns a win for :x in the first row when :x has the first row' do

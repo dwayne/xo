@@ -67,7 +67,7 @@ module TTT
           add_winner(board[1, 1], { where: :diagonal, index: 1 })
         end
 
-        if board[1, 3] == board[2, 2] && board[2, 2] == board[1, 3]
+        if board[1, 3] == board[2, 2] && board[2, 2] == board[3, 1]
           add_winner(board[1, 3], { where: :diagonal, index: 2 })
         end
       end
