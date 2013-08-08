@@ -5,10 +5,6 @@ module TTT
 
   describe Board do
 
-    before do
-      @board = Board.new
-    end
-
     it 'has 3 rows' do
       Board::ROWS.must_equal 3
     end
@@ -26,44 +22,48 @@ module TTT
     end
 
     it 'does not contain any r, c where either r is not in {1, 2, 3} or c is not in {1, 2, 3}' do
-      [[0, 0], [0, 4], [4, 0], [4, 4]].each do |cell|
+      [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4],
+       [1, 0],                         [1, 4],
+       [2, 0],                         [2, 4],
+       [3, 0],                         [3, 4],
+       [4, 0], [4, 1], [4, 2], [4, 3], [4, 4]].each do |cell|
         Board.contains?(*cell).must_equal false
       end
     end
 
-    it 'starts off empty' do
-      @board.empty?.must_equal true
+    let :board do
+      Board.new
     end
 
-    it 'starts off not full' do
-      @board.full?.must_equal false
+    describe '#empty?' do
+
+      it 'returns true for a new board' do
+        board.empty?.must_equal true
+      end
+
+      it 'returns false when an :x is on the board' do
+        board[1, 1] = :x
+        board.empty?.must_equal false
+      end
+
+      it 'returns false when an :o is on the board' do
+        board[1, 2] = :o
+        board.empty?.must_equal false
+      end
     end
 
-    it 'is not empty when at least one token is placed on the board' do
-      @board[1, 1] = :x
-      @board.empty?.must_equal false
+    describe '#[]' do
 
-      @board[1, 1] = :o
-      @board.empty?.must_equal false
+      it 'raises IndexError when queried with an out of bounds position' do
+        proc { board[0, 0] }.must_raise IndexError
+      end
     end
 
-    it 'raises IndexError when you try to place a value at a position that it does not contain' do
-      proc { @board[0, 0] = :anything }.must_raise IndexError
-    end
+    describe '#[]=' do
 
-    it 'raises IndexError when you try to query a position that it does not contain' do
-      proc { @board[0, 4] }.must_raise IndexError
-    end
-
-    it 'gets updated with the value you place on it' do
-      @board[2, 1] = :x
-      @board[2, 1].must_equal :x
-
-      @board[2, 2] = :o
-      @board[2, 2].must_equal :o
-
-      @board[2, 3] = :anything_else
-      @board[2, 3].must_equal :anything_else
+      it 'raises IndexError when a value is placed at an out of bounds position' do
+        proc { board[1, 0] = :anything }.must_raise IndexError
+      end
     end
 
     describe '#full?' do
@@ -71,49 +71,48 @@ module TTT
       before do
         (1..3).each do |r|
           (1..3).each do |c|
-            @board[r, c] = :x
+            board[r, c] = :x
           end
         end
       end
 
-      it 'returns true when every position has a token' do
-        @board.full?.must_equal true
+      it 'returns true when every position is occupied' do
+        board.full?.must_equal true
       end
 
-      it 'returns false when at least one position does not have a token' do
-        @board[1, 1] = :not_a_token
-        @board.full?.must_equal false
+      it 'returns false when at least one position is not occupied' do
+        board[1, 1] = :not_occupied
+        board.full?.must_equal false
       end
     end
 
     describe '#free?' do
 
-      it 'returns true when a non-token is placed at the position' do
-        @board[3, 1] = :anything_that_is_not_x_or_o
-        @board.free?(3, 1).must_equal true
+      it 'returns true when neither :x nor :o is at the given position' do
+        board.free?(3, 1).must_equal true
       end
 
-      it 'returns false when :x is placed at the position' do
-        @board[3, 2] = :x
-        @board.free?(3, 2).must_equal false
+      it 'returns false when :x occupies the position' do
+        board[3, 2] = :x
+        board.free?(3, 2).must_equal false
       end
 
-      it 'returns false when :o is placed at the position' do
-        @board[3, 3] = :o
-        @board.free?(3, 3).must_equal false
+      it 'returns false when :o occupies the position' do
+        board[3, 3] = :o
+        board.free?(3, 3).must_equal false
       end
     end
 
     describe '#clear' do
 
-      it 'removes all tokens' do
-        @board[1, 1] = :x
-        @board[1, 2] = :o
-        @board[1, 3] = :x
+      it 'removes all :x and :o' do
+        board[1, 1] = :x
+        board[1, 2] = :o
+        board[1, 3] = :x
 
-        @board.clear
+        board.clear
 
-        @board.empty?.must_equal true
+        board.empty?.must_equal true
       end
     end
 
@@ -122,9 +121,9 @@ module TTT
       it "visits every position and yields a block that takes the position's row, column and value" do
         visited = {}
 
-        @board.each do |r, c, val|
+        board.each do |r, c, val|
           # ensure that the value for the position is correct
-          @board[r, c].must_equal val
+          board[r, c].must_equal val
 
           # keep track of every position we visit
           visited[[r, c]] = val
