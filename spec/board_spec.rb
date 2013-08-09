@@ -132,5 +132,189 @@ module TTT
         visited.keys.size.must_equal(Board::ROWS * Board::COLS)
       end
     end
+
+    describe '#state' do
+
+      describe 'winning states' do
+
+        describe 'when :x wins in the 1st row' do
+
+          it 'returns that :x won together with the winning position' do
+            board[1, 1] = board[1, 2] = board[1, 3] = :x
+            board[2, 1] = board[2, 2] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :row, index: 1 }] }
+            )
+          end
+        end
+
+        describe 'when :x wins in the 2nd row' do
+
+          it 'returns that :x won together with the winning position' do
+            board[2, 1] = board[2, 2] = board[2, 3] = :x
+            board[1, 1] = board[1, 2] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :row, index: 2 }] }
+            )
+          end
+        end
+
+        describe 'when :x wins in the 3rd row' do
+
+          it 'returns that :x won together with the winning position' do
+            board[3, 1] = board[3, 2] = board[3, 3] = :x
+            board[2, 1] = board[2, 2] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :row, index: 3 }] }
+            )
+          end
+        end
+
+        describe 'when :x wins in the 1st column' do
+
+          it 'returns that :x won together with the winning position' do
+            board[1, 1] = board[2, 1] = board[3, 1] = :x
+            board[1, 2] = board[2, 2] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :column, index: 1 }] }
+            )
+          end
+        end
+
+        describe 'when :x wins in the 2nd column' do
+
+          it 'returns that :x won together with the winning position' do
+            board[1, 2] = board[2, 2] = board[3, 2] = :x
+            board[1, 1] = board[2, 1] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :column, index: 2 }] }
+            )
+          end
+        end
+
+        describe 'when :x wins in the 3rd column' do
+
+          it 'returns that :x won together with the winning position' do
+            board[1, 3] = board[2, 3] = board[3, 3] = :x
+            board[1, 2] = board[2, 2] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :column, index: 3 }] }
+            )
+          end
+        end
+
+        describe 'when :x wins in the 1st diagonal' do
+
+          it 'returns that :x won together with the winning position' do
+            board[1, 1] = board[2, 2] = board[3, 3] = :x
+            board[1, 2] = board[2, 1] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :diagonal, index: 1 }] }
+            )
+          end
+        end
+
+        describe 'when :x wins in the 2nd diagonal' do
+
+          it 'returns that :x won together with the winning position' do
+            board[1, 3] = board[2, 2] = board[3, 1] = :x
+            board[1, 2] = board[2, 1] = :o
+
+            board.state(:x).must_equal(
+              state: :game_over,
+              message: { reason: :winner, details: [{ where: :diagonal, index: 2 }] }
+            )
+          end
+        end
+      end
+
+      describe 'when :o loses to :x in the 1st row' do
+
+        it 'returns that :o lost together with the winning position of :x' do
+          board[1, 1] = board[1, 2] = board[1, 3] = :x
+          board[2, 1] = board[2, 3] = :o
+
+          board.state(:o).must_equal(
+            state: :game_over,
+            message: { reason: :loser, details: [{ where: :row, index: 1 }] }
+          )
+        end
+      end
+
+      describe 'when squashed' do
+
+        it 'returns that it is squashed' do
+          board[1, 1] = board[1, 3] = board[2, 2] = board[3, 2] = :x
+          board[1, 2] = board[2, 1] = board[2, 3] = board[3, 1] = board[3, 3] = :o
+
+          board.state(:x).must_equal(
+            state: :game_over,
+            message: { reason: :squashed }
+          )
+        end
+      end
+
+      describe 'when nothing significant happens' do
+
+        it 'returns that everything is normal' do
+          board.state(:x).must_equal(state: :normal)
+        end
+      end
+
+      it 'raises ArgumentError when the argument is neither :x nor :o' do
+        proc { board.state(:neither_x_nor_o) }.must_raise ArgumentError
+      end
+
+      describe 'invalid configurations' do
+
+        it 'raises TooManyMovesAheadError when :x is ahead of :o by 2 moves' do
+          board[1, 1] = board[1, 2] = :x
+
+          proc { board.state(:x) }.must_raise TooManyMovesAheadError
+        end
+
+        it 'raises TooManyMovesAheadError when :x is ahead of :o by more than 2 moves' do
+          board[1, 1] = board[1, 2] = board[1, 3] = board[3, 1] = board[3, 2] = board[3, 3] = :x
+          board[2, 1] = board[2, 2] = :o
+
+          proc { board.state(:o) }.must_raise TooManyMovesAheadError
+        end
+
+        it 'raises TooManyMovesAheadError when :o is ahead of :x by 2 moves' do
+          board[2, 1] = board[2, 2] = board[2, 3] = :o
+          board[3, 1] = :x
+
+          proc { board.state(:x) }.must_raise TooManyMovesAheadError
+        end
+
+        it 'raises TooManyMovesAheadError when :o is ahead of :x by more than 2 moves' do
+          board[1, 1] = board[2, 1] = board[2, 3] = board[3, 1] = board[3, 3] = :x
+          board[2, 2] = :o
+
+          proc { board.state(:o) }.must_raise TooManyMovesAheadError
+        end
+
+        it 'raise TwoWinnersError when both :x and :o have winning positions' do
+          board[1, 1] = board[1, 2] = board[1, 3] = :x
+          board[2, 1] = board[2, 2] = board[2, 3] = :o
+
+          proc { board.state(:x) }.must_raise TwoWinnersError
+        end
+      end
+    end
   end
 end

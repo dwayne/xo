@@ -53,9 +53,27 @@ module TTT
       r.between?(1, ROWS) && c.between?(1, COLS)
     end
 
+    def state(token)
+      raise ArgumentError, token unless [:x, :o].include?(token)
+      raise TooManyMovesAheadError if two_or_more_moves_ahead?
+      raise TwoWinnersError if two_winners?
+
+      if winners[token]
+        { state: :game_over, message: { reason: :winner, details: winners[token] } }
+      elsif winners[other_token(token)]
+        { state: :game_over, message: { reason: :loser, details: winners[other_token(token)] } }
+      else
+        if full?
+          { state: :game_over, message: { reason: :squashed } }
+        else
+          { state: :normal }
+        end
+      end
+    end
+
     private
 
-      attr_reader :board
+      attr_reader :board, :winners
 
       # Computes the 0-based index of position (r, c) on a ROWS x COLS board.
       #
@@ -71,5 +89,86 @@ module TTT
       def idx(r, c)
         COLS * (r - 1) + (c - 1)
       end
+
+      def two_winners?
+        find_winners
+
+        winners[:x] && winners[:o]
+      end
+
+      def find_winners
+        @winners = {}
+
+        # check the rows
+
+        if board[0] == board[1] && board[1] == board[2]
+          add_winner(board[0], { where: :row, index: 1 })
+        end
+
+        if board[3] == board[4] && board[4] == board[5]
+          add_winner(board[3], { where: :row, index: 2 })
+        end
+
+        if board[6] == board[7] && board[7] == board[8]
+          add_winner(board[6], { where: :row, index: 3 })
+        end
+
+        # check the columns
+
+        if board[0] == board[3] && board[3] == board[6]
+          add_winner(board[0], { where: :column, index: 1 })
+        end
+
+        if board[1] == board[4] && board[4] == board[7]
+          add_winner(board[1], { where: :column, index: 2 })
+        end
+
+        if board[2] == board[5] && board[5] == board[8]
+          add_winner(board[2], { where: :column, index: 3 })
+        end
+
+        # check the diagonals
+
+        if board[0] == board[4] && board[4] == board[8]
+          add_winner(board[0], { where: :diagonal, index: 1 })
+        end
+
+        if board[2] == board[4] && board[4] == board[6]
+          add_winner(board[2], { where: :diagonal, index: 2 })
+        end
+      end
+
+      def add_winner(token, details)
+        if [:x, :o].include?(token)
+          if winners.has_key?(token)
+            winners[token] << details
+          else
+            winners[token] = [ details ]
+          end
+        end
+      end
+
+      def two_or_more_moves_ahead?
+        moves_ahead >= 2
+      end
+
+      def moves_ahead
+        xs = os = 0
+
+        board.each do |t|
+          xs += 1 if t == :x
+          os += 1 if t == :o
+        end
+
+        (xs - os).abs
+      end
+
+      def other_token(token)
+        token == :x ? :o : :x
+      end
   end
+
+  class InvalidConfiguration < StandardError; end
+  class TooManyMovesAheadError < InvalidConfiguration; end
+  class TwoWinnersError < InvalidConfiguration; end
 end
