@@ -31,9 +31,7 @@ module TTT
       end
     end
 
-    let :board do
-      Board.new
-    end
+    let(:board) { Board.new }
 
     describe '#empty?' do
 
