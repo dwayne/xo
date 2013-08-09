@@ -31,6 +31,21 @@ module TTT
       end
     end
 
+    describe 'Board#token?' do
+
+      it 'returns true for :x' do
+        Board.is_token?(:x).must_equal true
+      end
+
+      it 'returns true for :o' do
+        Board.is_token?(:o).must_equal true
+      end
+
+      it 'return false if the argument is neither :x nor :o' do
+        Board.is_token?(:neither_x_nor_o).must_equal false
+      end
+    end
+
     let(:board) { Board.new }
 
     describe '#empty?' do

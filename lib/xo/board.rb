@@ -18,7 +18,7 @@ module TTT
     end
 
     def free?(r, c)
-      ![:x, :o].include?(self[r, c])
+      !self.class.is_token?(self[r, c])
     end
 
     def clear
@@ -53,8 +53,12 @@ module TTT
       r.between?(1, ROWS) && c.between?(1, COLS)
     end
 
+    def self.is_token?(val)
+      [:x, :o].include?(val)
+    end
+
     def state(token)
-      raise ArgumentError, token unless [:x, :o].include?(token)
+      raise ArgumentError, token unless self.class.is_token?(token)
       raise TooManyMovesAheadError if two_or_more_moves_ahead?
       raise TwoWinnersError if two_winners?
 
@@ -139,7 +143,7 @@ module TTT
       end
 
       def add_winner(token, details)
-        if [:x, :o].include?(token)
+        if self.class.is_token?(token)
           if winners.has_key?(token)
             winners[token] << details
           else
