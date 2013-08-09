@@ -276,6 +276,23 @@ module TTT
             )
           end
         end
+
+        describe 'when :x wins in two different ways' do
+
+          it 'returns that :x won together with both winning positions' do
+            board[1, 1] = board[1, 2] = board[1, 3] = board[2, 1] = board[3, 1] = :x
+            board[2, 2] = board[2, 3] = board[3, 2] = board[3, 3] = :o
+
+            result = board.state(:x)
+
+            result[:state].must_equal :game_over
+            result[:reason].must_equal :winner
+
+            result[:details].size.must_equal 2
+            result[:details].include? where: :row, index: 1
+            result[:details].include? where: :column, index: 1
+          end
+        end
       end
 
       describe 'when :o loses to :x in the 1st row' do
