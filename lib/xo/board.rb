@@ -57,6 +57,10 @@ module TTT
       [:x, :o].include?(val)
     end
 
+    def self.other_token(token)
+      token == :x ? :o : (token == :o ? :x : token)
+    end
+
     def state(token)
       raise ArgumentError, token unless self.class.is_token?(token)
       raise TooManyMovesAheadError if two_or_more_moves_ahead?
@@ -64,8 +68,8 @@ module TTT
 
       if winners[token]
         { state: :game_over, reason: :winner, details: winners[token] }
-      elsif winners[other_token(token)]
-        { state: :game_over, reason: :loser, details: winners[other_token(token)] }
+      elsif winners[self.class.other_token(token)]
+        { state: :game_over, reason: :loser, details: winners[self.class.other_token(token)] }
       else
         if full?
           { state: :game_over, reason: :squashed }
@@ -165,10 +169,6 @@ module TTT
         end
 
         (xs - os).abs
-      end
-
-      def other_token(token)
-        token == :x ? :o : :x
       end
   end
 

@@ -46,6 +46,21 @@ module TTT
       end
     end
 
+    describe 'Board#other_token' do
+
+      it 'returns :x when given :o' do
+        Board.other_token(:x).must_equal :o
+      end
+
+      it 'returns :o when given :x' do
+        Board.other_token(:o).must_equal :x
+      end
+
+      it "returns whatever it was given when it's not an :x or an :o" do
+        Board.other_token(:neither_x_nor_o).must_equal :neither_x_nor_o
+      end
+    end
+
     let(:board) { Board.new }
 
     describe '#empty?' do
