@@ -29,7 +29,7 @@ module TTT::Game
     end
 
     def start(token)
-      raise ArgumentError, token unless is_token?(token)
+      raise ArgumentError, token unless TTT::Board.is_token?(token)
       state.start(token)
       self
     end
@@ -45,7 +45,7 @@ module TTT::Game
     end
 
     def continue_playing(token)
-      raise ArgumentError, token unless is_token?(token)
+      raise ArgumentError, token unless TTT::Board.is_token?(token)
       state.continue_playing(token)
       self
     end
@@ -102,7 +102,7 @@ module TTT::Game
     end
 
     def next_turn
-      turn == :x ? :o : (turn == :o ? :x : turn)
+      TTT::Board.other_token(turn)
     end
 
     def idle_state; states[:idle]; end
@@ -116,9 +116,5 @@ module TTT::Game
     private
 
       attr_reader :states
-
-      def is_token?(val)
-        [:x, :o].include?(val)
-      end
   end
 end
