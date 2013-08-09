@@ -1,5 +1,5 @@
 require_relative 'spec_helper'
-require_relative '../lib/xo/board'
+require 'xo/board'
 
 module TTT
 
