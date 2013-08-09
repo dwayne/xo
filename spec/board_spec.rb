@@ -143,7 +143,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :row, index: 1 }] }
+              reason: :winner,
+              details: [{ where: :row, index: 1 }]
             )
           end
         end
@@ -156,7 +157,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :row, index: 2 }] }
+              reason: :winner,
+              details: [{ where: :row, index: 2 }]
             )
           end
         end
@@ -169,7 +171,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :row, index: 3 }] }
+              reason: :winner,
+              details: [{ where: :row, index: 3 }]
             )
           end
         end
@@ -182,7 +185,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :column, index: 1 }] }
+              reason: :winner,
+              details: [{ where: :column, index: 1 }]
             )
           end
         end
@@ -195,7 +199,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :column, index: 2 }] }
+              reason: :winner,
+              details: [{ where: :column, index: 2 }]
             )
           end
         end
@@ -208,7 +213,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :column, index: 3 }] }
+              reason: :winner,
+              details: [{ where: :column, index: 3 }]
             )
           end
         end
@@ -221,7 +227,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :diagonal, index: 1 }] }
+              reason: :winner,
+              details: [{ where: :diagonal, index: 1 }]
             )
           end
         end
@@ -234,7 +241,8 @@ module TTT
 
             board.state(:x).must_equal(
               state: :game_over,
-              message: { reason: :winner, details: [{ where: :diagonal, index: 2 }] }
+              reason: :winner,
+              details: [{ where: :diagonal, index: 2 }]
             )
           end
         end
@@ -248,7 +256,8 @@ module TTT
 
           board.state(:o).must_equal(
             state: :game_over,
-            message: { reason: :loser, details: [{ where: :row, index: 1 }] }
+            reason: :loser,
+            details: [{ where: :row, index: 1 }]
           )
         end
       end
@@ -261,7 +270,7 @@ module TTT
 
           board.state(:x).must_equal(
             state: :game_over,
-            message: { reason: :squashed }
+            reason: :squashed
           )
         end
       end

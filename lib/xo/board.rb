@@ -59,12 +59,12 @@ module TTT
       raise TwoWinnersError if two_winners?
 
       if winners[token]
-        { state: :game_over, message: { reason: :winner, details: winners[token] } }
+        { state: :game_over, reason: :winner, details: winners[token] }
       elsif winners[other_token(token)]
-        { state: :game_over, message: { reason: :loser, details: winners[other_token(token)] } }
+        { state: :game_over, reason: :loser, details: winners[other_token(token)] }
       else
         if full?
-          { state: :game_over, message: { reason: :squashed } }
+          { state: :game_over, reason: :squashed }
         else
           { state: :normal }
         end
