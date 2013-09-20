@@ -1,2 +1,2 @@
-require 'xo/board'
-require 'xo/game/engine'
+require 'xo/grid'
+require 'xo/evaluator'
