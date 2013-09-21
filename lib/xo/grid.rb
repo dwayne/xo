@@ -1,4 +1,5 @@
 module TTT
+
   class Grid
 
     ROWS = 3

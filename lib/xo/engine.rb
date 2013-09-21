@@ -9,16 +9,11 @@ module TTT
   class Engine
     include Observable
 
-    attr_reader :turn, :state, :x, :o
+    attr_reader :turn, :state
 
-    def initialize(x = :x, o = :o)
-      raise ArgumentError, 'x equals o' if x == o
-
-      @x = x
-      @o = o
-
-      @grid  = Grid.new
-      @turn  = :nobody
+    def initialize
+      @grid = Grid.new
+      @turn = :nobody
       @state = :idle
     end
 
@@ -27,19 +22,15 @@ module TTT
     end
 
     def next_turn
-      turn == x ? o : (turn == o ? x : :nobody)
+      turn == TTT::X ? TTT::O : (turn == TTT::O ? TTT::X : :nobody)
     end
 
-    def is_token?(val)
-      [x, o].include?(val)
-    end
-
-    def start(token)
-      raise ArgumentError, "#{token} is not a token" unless is_token?(token)
+    def start(player)
+      raise ArgumentError, "unknown player #{player}" unless TTT.is_token?(player)
 
       case state
       when :idle
-        handle_start(token)
+        handle_start(player)
       else
         raise NotImplementedError
       end
@@ -69,12 +60,12 @@ module TTT
       self
     end
 
-    def continue_playing(token)
-      raise ArgumentError, "#{token} is not a token" unless is_token?(token)
+    def continue_playing(player)
+      raise ArgumentError, "unknown player #{player}" unless TTT.is_token?(player)
 
       case state
       when :game_over
-        handle_continue_playing(token)
+        handle_continue_playing(player)
       else
         raise NotImplementedError
       end
@@ -86,12 +77,12 @@ module TTT
 
       attr_writer :turn, :state
 
-      def handle_start(token)
-        self.turn = token
+      def handle_start(player)
+        self.turn = player
         self.state = :playing
         @grid.clear
 
-        send_event(:game_started, who: token)
+        send_event(:game_started, who: player)
       end
 
       def handle_stop
@@ -106,7 +97,7 @@ module TTT
             @grid[r, c] = turn
             last_played_at = OpenStruct.new(row: r, col: c)
 
-            result = Evaluator.analyze(@grid, turn, x, o)
+            result = Evaluator.analyze(@grid, turn)
 
             case result[:status]
             when :ok
@@ -130,12 +121,12 @@ module TTT
         end
       end
 
-      def handle_continue_playing(token)
-        self.turn = token
+      def handle_continue_playing(player)
+        self.turn = player
         self.state = :playing
         @grid.clear
 
-        send_event(:continue_playing, who: token)
+        send_event(:continue_playing, who: player)
       end
 
       def send_event(name, message = {})

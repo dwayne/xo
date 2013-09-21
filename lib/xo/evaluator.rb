@@ -1,14 +1,10 @@
 module TTT
+
   module Evaluator
 
-    def self.analyze(grid, player, x = :x, o = :o)
-      raise ArgumentError, 'x equals o' if x == o
-      raise ArgumentError, "unknown player #{player}" unless [x, o].include?(player)
-
+    def self.analyze(grid, player)
       @grid = grid
       @player = player
-      @x = x
-      @o = o
 
       perform_analysis
     end
@@ -16,7 +12,7 @@ module TTT
     private
 
       class << self
-        attr_reader :grid, :player, :x, :o, :winners
+        attr_reader :grid, :player, :winners
       end
 
       def self.perform_analysis
@@ -47,8 +43,8 @@ module TTT
         xs = os = 0
 
         grid.each do |_, _, val|
-          xs += 1 if val == x
-          os += 1 if val == o
+          xs += 1 if val == TTT::X
+          os += 1 if val == TTT::O
         end
 
         (xs - os).abs
@@ -94,7 +90,7 @@ module TTT
       end
 
       def self.add_winner(who, details)
-        if [x, o].include?(who)
+        if TTT.is_token?(who)
           if winners.key?(who)
             winners[who] << details
           else
@@ -104,11 +100,11 @@ module TTT
       end
 
       def self.two_winners?
-        winners[x] && winners[o]
+        winners[TTT::X] && winners[TTT::O]
       end
 
       def self.other_player
-        player == x ? o : x
+        player == TTT::X ? TTT::O : TTT::X
       end
   end
 end

@@ -8,11 +8,6 @@ module TTT
 
     describe 'initial state' do
 
-      it 'uses x and o' do
-        engine.x.must_equal :x
-        engine.o.must_equal :o
-      end
-
       it 'has an empty grid' do
         engine.grid.empty?.must_equal true
       end
@@ -30,7 +25,7 @@ module TTT
 
       it 'returns a copy' do
         grid = engine.grid
-        grid[1, 1] = :x
+        grid[1, 1] = X
 
         # FIXME: How else can I test this requirement? I don't like that the test
         # depends on knowing the name of the internal private instance variable.
@@ -51,9 +46,9 @@ module TTT
 
         engine.add_observer(observer, :handle_event)
 
-        engine.start(:x).play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
+        engine.start(X).play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
 
-        observer.instance_variable_get(:@winner).must_equal :x
+        observer.instance_variable_get(:@winner).must_equal X
       end
     end
   end
