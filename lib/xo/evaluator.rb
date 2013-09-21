@@ -102,7 +102,7 @@ module TTT
       end
 
       def self.other_player
-        player == TTT::X ? TTT::O : (player == TTT::O ? TTT::X : player)
+        TTT.other_token(player)
       end
   end
 end

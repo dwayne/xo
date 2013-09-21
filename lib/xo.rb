@@ -6,6 +6,10 @@ module TTT
   def self.is_token?(val)
     [X, O].include?(val)
   end
+
+  def self.other_token(token)
+    token == X ? O : (token == O ? X : token)
+  end
 end
 
 require 'xo/grid'

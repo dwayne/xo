@@ -22,7 +22,7 @@ module TTT
     end
 
     def next_turn
-      turn == TTT::X ? TTT::O : (turn == TTT::O ? TTT::X : :nobody)
+      TTT.other_token(turn)
     end
 
     def start(player)
