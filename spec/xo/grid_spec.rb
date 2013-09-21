@@ -42,27 +42,27 @@ module TTT
     describe '#dup' do
 
       it 'creates a copy' do
-        grid[1, 1] = :a
+        grid[1, 1] = X
 
         grid_copy = grid.dup
-        grid_copy[1, 1] = :b
+        grid_copy[1, 1] = O
 
-        grid[1, 1].must_equal :a
+        grid[1, 1].must_equal X
       end
     end
 
     describe '#empty?' do
 
-      it 'returns false when at least one position is occupied' do
-        grid[1, 1] = :anything
+      it 'returns false when at least one position has a token' do
+        grid[1, 1] = X
         grid.empty?.must_equal false
       end
     end
 
     describe '#[]=' do
 
-      it 'raises IndexError when a value is placed at a position it does not contain' do
-        proc { grid[0, 0] = :anything }.must_raise IndexError
+      it 'raises IndexError when a token is placed at a position it does not contain' do
+        proc { grid[0, 0] = X }.must_raise IndexError
       end
     end
 
@@ -78,29 +78,29 @@ module TTT
       before do
         (1..3).each do |r|
           (1..3).each do |c|
-            grid[r, c] = :anything
+            grid[r, c] = O
           end
         end
       end
 
-      it 'returns true when every position has a value' do
+      it 'returns true when every position has a token' do
         grid.full?.must_equal true
       end
 
-      it 'returns false when at least one position does not have a value' do
-        grid[1, 1] = nil
+      it 'returns false when at least one position does not have a token' do
+        grid[1, 1] = :e
         grid.full?.must_equal false
       end
     end
 
     describe '#free?' do
 
-      it 'returns true when no value is at the given position' do
+      it 'returns true when no token is at the given position' do
         grid.free?(2, 2).must_equal true
       end
 
-      it 'returns false when a value is at the given position' do
-        grid[3, 1] = :anything
+      it 'returns false when a token is at the given position' do
+        grid[3, 1] = O
         grid.free?(3, 1).must_equal false
       end
 
@@ -112,9 +112,9 @@ module TTT
     describe '#clear' do
 
       it 'empties the grid' do
-        grid[1, 1] = :a
-        grid[1, 3] = :b
-        grid[3, 2] = :c
+        grid[1, 1] = X
+        grid[1, 3] = O
+        grid[3, 2] = X
 
         grid.clear
 
@@ -125,9 +125,9 @@ module TTT
     describe '#each' do
 
       it "visits every position and yields a block that takes the position's row, column and value" do
-        grid[1, 1] = :x
-        grid[2, 2] = :y
-        grid[3, 3] = :z
+        grid[1, 1] = O
+        grid[2, 2] = X
+        grid[3, 3] = O
 
         visited = {}
 

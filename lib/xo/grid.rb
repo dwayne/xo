@@ -10,7 +10,7 @@ module TTT
     end
 
     def initialize
-      @grid = Array.new(ROWS * COLS)
+      @grid = Array.new(ROWS * COLS, :e)
     end
 
     def initialize_copy(orig)
@@ -34,19 +34,19 @@ module TTT
     end
 
     def empty?
-      grid.all?(&:nil?)
+      grid.all? { |val| !TTT.is_token?(val) }
     end
 
     def full?
-      grid.all? { |val| !val.nil? }
+      grid.all? { |val| TTT.is_token?(val) }
     end
 
     def free?(r, c)
-      self[r, c].nil?
+      !TTT.is_token?(self[r, c])
     end
 
     def clear
-      grid.fill(nil)
+      grid.fill(:e)
     end
 
     def each
