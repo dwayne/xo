@@ -102,7 +102,7 @@ module TTT
       end
 
       def self.other_player
-        TTT.other_token(player)
+        TTT.other_player(player)
       end
   end
 end
