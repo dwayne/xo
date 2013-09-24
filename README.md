@@ -34,5 +34,5 @@ g[1, 3] = :o
 
 puts Benchmark.measure { TTT::AI.minimax(g, :x) }
 # => 0.690000   0.000000   0.690000 (  0.695095)
-# => Worst-case time, performance only improves from here on as the board gets filled
+# => Worst-case time, performance only improves from here on as the grid gets filled
 ```
