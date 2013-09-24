@@ -5,9 +5,54 @@ module TTT
   module AI
 
     def self.minimax(grid, player)
-      start_state = MaxGameState.new(grid, player)
-      start_state.next_states.select { |next_state| start_state.score == next_state.score }.map(&:move)
+      if moves = get_moves_from_cache(grid, player)
+        moves.map { |move| OpenStruct.new(row: move[0], column: move[1]) }
+      else
+        start_state = MaxGameState.new(grid, player)
+        start_state.next_states.select { |next_state| start_state.score == next_state.score }.map(&:move)
+      end
     end
+
+    def self.get_moves_from_cache(grid, player)
+      result = TTT::Evaluator.analyze(grid, player)
+
+      case result[:status]
+      when :ok
+        MOVES_CACHE[grid] || MOVES_CACHE[invert_grid(grid)]
+      when :game_over
+        []
+      else
+        raise IllegalGridStatusError
+      end
+    end
+
+    def self.invert_grid(grid)
+      (new_grid = grid.dup).each do |r, c, val|
+        new_grid[r, c] = TTT::other_token(val)
+      end
+    end
+
+    def self.one_x_grid(r, c)
+      TTT::Grid.new.tap do |grid|
+        grid[r, c] = :x
+      end
+    end
+
+    MOVES_CACHE = {
+      TTT::Grid.new => [[1, 1], [1, 2], [1, 3], [2, 1], [2, 2], [2, 3], [3, 1], [3, 2], [3, 3]],
+
+      one_x_grid(1, 1) => [[2, 2]],
+      one_x_grid(1, 3) => [[2, 2]],
+      one_x_grid(3, 1) => [[2, 2]],
+      one_x_grid(3, 3) => [[2, 2]],
+
+      one_x_grid(1, 2) => [[1, 1], [1, 3], [2, 2], [3, 2]],
+      one_x_grid(2, 1) => [[1, 1], [2, 2], [2, 3], [3, 1]],
+      one_x_grid(2, 3) => [[1, 3], [2, 1], [2, 2], [3, 3]],
+      one_x_grid(3, 2) => [[1, 2], [2, 2], [3, 1], [3, 3]],
+
+      one_x_grid(2, 2) => [[1, 1], [1, 3], [3, 1], [3, 3]]
+    }
 
     class GameState
 
@@ -18,8 +63,7 @@ module TTT
         @player = player
         @move   = move
 
-        clear_cache!
-        generate_next_states unless find_in_cache
+        generate_next_states
       end
 
       def result
@@ -40,21 +84,13 @@ module TTT
       def scores
         next_states.map(&:score)
       end
-      protected :scores
 
       def score
-        return @score if defined? @score
-
-        @score =
-          if (state = find_in_cache) && state != self
-            state.score
-          else
-            if is_terminal?
-              terminal_score
-            else
-              non_terminal_score
-            end
-          end
+        if is_terminal?
+          terminal_score
+        else
+          non_terminal_score
+        end
       end
 
       def terminal_score
@@ -69,50 +105,7 @@ module TTT
         raise NotImplementedError
       end
 
-      def clear_cache!
-        @@cache = {} if move.nil?
-      end
-
       private
-
-        def find_in_cache
-          unless defined? @cached_state
-            @cached_state = nil
-
-            (1..3).each do |n|
-              rotated_grid = self.class.rotate_grid(grid, n)
-
-              if @@cache.key?(rotated_grid)
-                @cached_state = @@cache[rotated_grid]
-                break
-              end
-            end
-          end
-
-          @cached_state
-        end
-
-        def self.rotate_grid(grid, n)
-          if n == 0
-            grid
-          else
-            new_grid = TTT::Grid.new
-
-            new_grid[1, 1] = grid[1, 3]
-            new_grid[1, 2] = grid[2, 3]
-            new_grid[1, 3] = grid[3, 3]
-
-            new_grid[2, 1] = grid[1, 2]
-            new_grid[2, 2] = grid[2, 2]
-            new_grid[2, 3] = grid[3, 2]
-
-            new_grid[3, 1] = grid[1, 1]
-            new_grid[3, 2] = grid[2, 1]
-            new_grid[3, 3] = grid[3, 1]
-
-            rotate_grid(new_grid, n-1)
-          end
-        end
 
         def generate_next_states
           @next_states = []
@@ -127,8 +120,6 @@ module TTT
               end
             end
           end
-
-          @@cache[grid] = self
         end
     end
 

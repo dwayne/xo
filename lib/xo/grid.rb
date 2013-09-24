@@ -55,6 +55,8 @@ module TTT
           yield(r, c, self[r, c])
         end
       end
+
+      self
     end
 
     def ==(other)
