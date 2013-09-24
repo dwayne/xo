@@ -10,8 +10,13 @@ module TTT
   def self.other_token(token)
     token == X ? O : (token == O ? X : token)
   end
+
+  class << self
+    alias_method :other_player, :other_token
+  end
 end
 
 require 'xo/grid'
 require 'xo/evaluator'
 require 'xo/engine'
+require 'xo/ai'
