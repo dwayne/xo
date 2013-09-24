@@ -57,6 +57,16 @@ module TTT
       end
     end
 
+    def ==(other)
+      return false unless other.instance_of?(self.class)
+      grid == other.instance_variable_get(:@grid)
+    end
+    alias_method :eql?, :==
+
+    def hash
+      grid.hash
+    end
+
     private
 
       attr_reader :grid

@@ -2,7 +2,7 @@ require 'ostruct'
 
 module TTT
 
-  module AI
+  module AI::Zero
 
     def self.minimax(grid, player)
       start_state = MaxGameState.new(grid, player)
@@ -18,8 +18,7 @@ module TTT
         @player = player
         @move   = move
 
-        clear_cache!
-        generate_next_states unless find_in_cache
+        generate_next_states
       end
 
       def result
@@ -40,21 +39,13 @@ module TTT
       def scores
         next_states.map(&:score)
       end
-      protected :scores
 
       def score
-        return @score if defined? @score
-
-        @score =
-          if (state = find_in_cache) && state != self
-            state.score
-          else
-            if is_terminal?
-              terminal_score
-            else
-              non_terminal_score
-            end
-          end
+        if is_terminal?
+          terminal_score
+        else
+          non_terminal_score
+        end
       end
 
       def terminal_score
@@ -69,50 +60,7 @@ module TTT
         raise NotImplementedError
       end
 
-      def clear_cache!
-        @@cache = {} if move.nil?
-      end
-
       private
-
-        def find_in_cache
-          unless defined? @cached_state
-            @cached_state = nil
-
-            (1..3).each do |n|
-              rotated_grid = self.class.rotate_grid(grid, n)
-
-              if @@cache.key?(rotated_grid)
-                @cached_state = @@cache[rotated_grid]
-                break
-              end
-            end
-          end
-
-          @cached_state
-        end
-
-        def self.rotate_grid(grid, n)
-          if n == 0
-            grid
-          else
-            new_grid = TTT::Grid.new
-
-            new_grid[1, 1] = grid[1, 3]
-            new_grid[1, 2] = grid[2, 3]
-            new_grid[1, 3] = grid[3, 3]
-
-            new_grid[2, 1] = grid[1, 2]
-            new_grid[2, 2] = grid[2, 2]
-            new_grid[2, 3] = grid[3, 2]
-
-            new_grid[3, 1] = grid[1, 1]
-            new_grid[3, 2] = grid[2, 1]
-            new_grid[3, 3] = grid[3, 1]
-
-            rotate_grid(new_grid, n-1)
-          end
-        end
 
         def generate_next_states
           @next_states = []
@@ -127,8 +75,6 @@ module TTT
               end
             end
           end
-
-          @@cache[grid] = self
         end
     end
 
