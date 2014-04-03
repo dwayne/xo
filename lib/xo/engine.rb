@@ -4,7 +4,7 @@ require 'ostruct'
 require 'xo/grid'
 require 'xo/evaluator'
 
-module TTT
+module XO
 
   class Engine
     include Observable
@@ -22,11 +22,11 @@ module TTT
     end
 
     def next_turn
-      TTT.other_token(turn)
+      XO.other_token(turn)
     end
 
     def start(player)
-      raise ArgumentError, "unknown player #{player}" unless TTT.is_token?(player)
+      raise ArgumentError, "unknown player #{player}" unless XO.is_token?(player)
 
       case state
       when :idle
@@ -61,7 +61,7 @@ module TTT
     end
 
     def continue_playing(player)
-      raise ArgumentError, "unknown player #{player}" unless TTT.is_token?(player)
+      raise ArgumentError, "unknown player #{player}" unless XO.is_token?(player)
 
       case state
       when :game_over

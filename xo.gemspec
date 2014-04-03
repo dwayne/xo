@@ -5,7 +5,7 @@ require 'xo/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'xo'
-  spec.version       = TTT::VERSION
+  spec.version       = XO::VERSION
   spec.author        = 'Dwayne R. Crooks'
   spec.email         = ['me@dwaynecrooks.com']
   spec.summary       = %q{A Ruby library for Tic-tac-toe.}

@@ -1,4 +1,4 @@
-module TTT
+module XO
 
   X = :x
   O = :o

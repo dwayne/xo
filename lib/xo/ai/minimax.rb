@@ -1,7 +1,7 @@
 require 'ostruct'
 require 'xo/evaluator'
 
-module TTT::AI
+module XO::AI
 
   def self.minimax(grid, player)
     state = MaxGameState.new(grid, player)
@@ -23,7 +23,7 @@ module TTT::AI
     end
 
     def result
-      @result ||= TTT::Evaluator.analyze(grid, player)
+      @result ||= XO::Evaluator.analyze(grid, player)
     end
 
     def is_terminal?
@@ -71,7 +71,7 @@ module TTT::AI
             next_grid = grid.dup
             next_grid[r, c] = player
 
-            @next_states << next_game_state(next_grid, TTT.other_player(player), TTT::Position.new(r, c))
+            @next_states << next_game_state(next_grid, XO.other_player(player), XO::Position.new(r, c))
           end
         end
       end

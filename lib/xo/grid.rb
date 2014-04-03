@@ -1,4 +1,4 @@
-module TTT
+module XO
 
   class Grid
 
@@ -34,15 +34,15 @@ module TTT
     end
 
     def empty?
-      grid.all? { |val| !TTT.is_token?(val) }
+      grid.all? { |val| !XO.is_token?(val) }
     end
 
     def full?
-      grid.all? { |val| TTT.is_token?(val) }
+      grid.all? { |val| XO.is_token?(val) }
     end
 
     def free?(r, c)
-      !TTT.is_token?(self[r, c])
+      !XO.is_token?(self[r, c])
     end
 
     def clear

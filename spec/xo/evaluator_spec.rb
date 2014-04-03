@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-module TTT
+module XO
 
   describe Evaluator do
 

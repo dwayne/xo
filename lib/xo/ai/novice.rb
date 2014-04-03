@@ -1,6 +1,6 @@
 require 'xo/ai/expert'
 
-module TTT::AI
+module XO::AI
 
   class Novice < Expert
 

@@ -1,4 +1,4 @@
-module TTT
+module XO
 
   module Evaluator
 
@@ -43,8 +43,8 @@ module TTT
         xs = os = 0
 
         grid.each do |_, _, val|
-          xs += 1 if val == TTT::X
-          os += 1 if val == TTT::O
+          xs += 1 if val == XO::X
+          os += 1 if val == XO::O
         end
 
         (xs - os).abs
@@ -54,37 +54,37 @@ module TTT
         @winners = {}
 
         # check rows
-        if TTT.is_token?(grid[1, 1]) && grid[1, 1] == grid[1, 2] && grid[1, 2] == grid[1, 3]
+        if XO.is_token?(grid[1, 1]) && grid[1, 1] == grid[1, 2] && grid[1, 2] == grid[1, 3]
           add_winner(grid[1, 1], { where: :row, index: 1, positions: [[1, 1], [1, 2], [1, 3]] })
         end
 
-        if TTT.is_token?(grid[2, 1]) && grid[2, 1] == grid[2, 2] && grid[2, 2] == grid[2, 3]
+        if XO.is_token?(grid[2, 1]) && grid[2, 1] == grid[2, 2] && grid[2, 2] == grid[2, 3]
           add_winner(grid[2, 1], { where: :row, index: 2, positions: [[2, 1], [2, 2], [2, 3]] })
         end
 
-        if TTT.is_token?(grid[3, 1]) && grid[3, 1] == grid[3, 2] && grid[3, 2] == grid[3, 3]
+        if XO.is_token?(grid[3, 1]) && grid[3, 1] == grid[3, 2] && grid[3, 2] == grid[3, 3]
           add_winner(grid[3, 1], { where: :row, index: 3, positions: [[3, 1], [3, 2], [3, 3]] })
         end
 
         # check columns
-        if TTT.is_token?(grid[1, 1]) && grid[1, 1] == grid[2, 1] && grid[2, 1] == grid[3, 1]
+        if XO.is_token?(grid[1, 1]) && grid[1, 1] == grid[2, 1] && grid[2, 1] == grid[3, 1]
           add_winner(grid[1, 1], { where: :column, index: 1, positions: [[1, 1], [2, 1], [3, 1]] })
         end
 
-        if TTT.is_token?(grid[1, 2]) && grid[1, 2] == grid[2, 2] && grid[2, 2] == grid[3, 2]
+        if XO.is_token?(grid[1, 2]) && grid[1, 2] == grid[2, 2] && grid[2, 2] == grid[3, 2]
           add_winner(grid[1, 2], { where: :column, index: 2, positions: [[1, 2], [2, 2], [3, 2]] })
         end
 
-        if TTT.is_token?(grid[1, 3]) && grid[1, 3] == grid[2, 3] && grid[2, 3] == grid[3, 3]
+        if XO.is_token?(grid[1, 3]) && grid[1, 3] == grid[2, 3] && grid[2, 3] == grid[3, 3]
           add_winner(grid[1, 3], { where: :column, index: 3, positions: [[1, 3], [2, 3], [3, 3]] })
         end
 
         # check diagonals
-        if TTT.is_token?(grid[1, 1]) && grid[1, 1] == grid[2, 2] && grid[2, 2] == grid[3, 3]
+        if XO.is_token?(grid[1, 1]) && grid[1, 1] == grid[2, 2] && grid[2, 2] == grid[3, 3]
           add_winner(grid[1, 1], { where: :diagonal, index: 1, positions: [[1, 1], [2, 2], [3, 3]] })
         end
 
-        if TTT.is_token?(grid[1, 3]) && grid[1, 3] == grid[2, 2] && grid[2, 2] == grid[3, 1]
+        if XO.is_token?(grid[1, 3]) && grid[1, 3] == grid[2, 2] && grid[2, 2] == grid[3, 1]
           add_winner(grid[1, 3], { where: :diagonal, index: 2, positions: [[1, 3], [2, 2], [3, 1]] })
         end
       end
@@ -98,11 +98,11 @@ module TTT
       end
 
       def self.two_winners?
-        winners[TTT::X] && winners[TTT::O]
+        winners[XO::X] && winners[XO::O]
       end
 
       def self.other_player
-        TTT.other_player(player)
+        XO.other_player(player)
       end
   end
 end
