@@ -26,7 +26,7 @@ module XO
     end
 
     def start(player)
-      raise ArgumentError, "unknown player #{player}" unless XO.is_token?(player)
+      raise ArgumentError, "unknown player #{player}" unless XO.is_player?(player)
 
       case state
       when :idle
@@ -61,7 +61,7 @@ module XO
     end
 
     def continue_playing(player)
-      raise ArgumentError, "unknown player #{player}" unless XO.is_token?(player)
+      raise ArgumentError, "unknown player #{player}" unless XO.is_player?(player)
 
       case state
       when :game_over

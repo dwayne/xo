@@ -12,6 +12,7 @@ module XO
   end
 
   class << self
+    alias_method :is_player?, :is_token?
     alias_method :other_player, :other_token
   end
 
