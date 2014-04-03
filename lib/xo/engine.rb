@@ -22,7 +22,7 @@ module XO
     end
 
     def next_turn
-      XO.other_token(turn)
+      XO.other_player(turn)
     end
 
     def start(player)
