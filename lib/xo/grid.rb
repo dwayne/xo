@@ -59,6 +59,10 @@ module TTT
       self
     end
 
+    def each_free
+      self.each { |r, c, _| yield(r, c) if free?(r, c) }
+    end
+
     def ==(other)
       return false unless other.instance_of?(self.class)
       grid == other.instance_variable_get(:@grid)

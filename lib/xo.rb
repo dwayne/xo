@@ -14,6 +14,8 @@ module TTT
   class << self
     alias_method :other_player, :other_token
   end
+
+  class Position < Struct.new(:row, :column); end
 end
 
 require 'xo/grid'

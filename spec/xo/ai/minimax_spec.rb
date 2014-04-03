@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module TTT
 
-   describe AI do
+  describe AI do
 
     describe 'minimax' do
 
@@ -14,7 +14,7 @@ module TTT
           grid[1, 1] = grid[1, 2] = :x
           grid[2, 1] = grid[2, 2] = :o
 
-          moves = AI.minimax(grid, :x)
+          moves = AI.minimax(grid, :x).moves
 
           moves.size.must_equal 1
           [moves[0].row, moves[0].column].must_equal [1, 3]
@@ -24,7 +24,7 @@ module TTT
           grid[2, 1] = grid[2, 3] = grid[3, 1] = :x
           grid[1, 1] = grid[1, 2] = grid[2, 2] = :o
 
-          moves = AI.minimax(grid, :o)
+          moves = AI.minimax(grid, :o).moves
 
           moves.size.must_equal 3
           [moves[0].row, moves[0].column].must_equal [1, 3]
@@ -39,7 +39,7 @@ module TTT
           grid[1, 1] = grid[3, 1] = :x
           grid[2, 2] = :o
 
-          moves = AI.minimax(grid, :o)
+          moves = AI.minimax(grid, :o).moves
 
           moves.size.must_equal 1
           [moves[0].row, moves[0].column].must_equal [2, 1]
@@ -52,7 +52,7 @@ module TTT
           grid[1, 1] = grid[3, 1] = :x
           grid[2, 1] = grid[3, 3] = :o
 
-          moves = AI.minimax(grid, :x)
+          moves = AI.minimax(grid, :x).moves
 
           moves.size.must_equal 1
           [moves[0].row, moves[0].column].must_equal [1, 3]
