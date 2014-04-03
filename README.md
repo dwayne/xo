@@ -2,13 +2,6 @@
 
 A [Ruby](http://www.ruby-lang.org/en/) library for [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
 
-# Running the Tests
-
-You can run:
-
-- All tests: `rake test`
-- One test: `ruby -Ilib -Ispec spec/path_to_spec_file.rb`
-
 # Performance of the Minimax Algorithm
 
 ```ruby
@@ -36,3 +29,27 @@ puts Benchmark.measure { XO::AI.minimax(g, :x) }
 # => 0.690000   0.000000   0.690000 (  0.695095)
 # => Worst-case time, performance only improves from here on as the grid gets filled
 ```
+
+# Testing
+
+You can run:
+
+- All tests: `rake test`
+- One test: `ruby -Ilib -Ispec spec/path_to_spec_file.rb`
+
+# TODO
+
+1. Write documentation.
+2. Show example usage.
+3. Write an example Tic-tac-toe command-line game client.
+
+# Contributing
+
+If you'd like to contribute a feature or bugfix: Thanks! To make sure your fix/feature has a high chance of being included, please read the following guidelines:
+
+1. Post a [pull request](https://github.com/dwayne/xo/compare/).
+2. Make sure there are tests! I will not accept any patch that is not tested. It's a rare time when explicit tests aren't needed. If you have questions about writing tests for xo, please open a [GitHub issue](https://github.com/dwayne/xo/issues/new).
+
+# License
+
+xo is Copyright © 2014 Dwayne R. Crooks. It is free software, and may be redistributed under the terms specified in the MIT-LICENSE file.
