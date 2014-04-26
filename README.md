@@ -1,5 +1,7 @@
 # xo
 
+[![Build Status](https://travis-ci.org/dwayne/xo.svg?branch=master)](https://travis-ci.org/dwayne/xo)
+
 A [Ruby](http://www.ruby-lang.org/en/) library for [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
 
 # Performance of the Minimax Algorithm
