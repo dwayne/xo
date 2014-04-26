@@ -20,4 +20,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'rake', '~> 10.1', '>= 10.1.0'
   spec.add_development_dependency 'minitest', '~> 5.3', '>= 5.3.2'
+  spec.add_development_dependency 'coveralls'
 end
