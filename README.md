@@ -1,6 +1,6 @@
 # xo
 
-[![Gem Version](https://badge.fury.io/rb/xo.svg)](http://badge.fury.io/rb/xo) [![Build Status](https://travis-ci.org/dwayne/xo.svg?branch=master)](https://travis-ci.org/dwayne/xo)
+[![Gem Version](https://badge.fury.io/rb/xo.svg)](http://badge.fury.io/rb/xo) [![Build Status](https://travis-ci.org/dwayne/xo.svg?branch=master)](https://travis-ci.org/dwayne/xo) [![Coverage Status](https://coveralls.io/repos/dwayne/xo/badge.png)](https://coveralls.io/r/dwayne/xo)
 
 A [Ruby](http://www.ruby-lang.org/en/) library for [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
 
