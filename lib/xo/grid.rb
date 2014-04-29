@@ -73,6 +73,14 @@ module XO
       grid.hash
     end
 
+    def to_s
+      [" #{t grid[0]} | #{t grid[1]} | #{t grid[2]} ",
+       "---+---+---",
+       " #{t grid[3]} | #{t grid[4]} | #{t grid[5]} ",
+       "---+---+---",
+       " #{t grid[6]} | #{t grid[7]} | #{t grid[8]} "].join("\n")
+    end
+
     private
 
       attr_reader :grid
@@ -90,6 +98,10 @@ module XO
       # For e.g. idx(2, 3) is 5.
       def idx(r, c)
         COLS * (r - 1) + (c - 1)
+      end
+
+      def t(val)
+        XO.is_token?(val) ? val : ' '
       end
   end
 end
