@@ -101,6 +101,7 @@ module XO
               when :winner
                 make_event(:game_over, type: :winner, who: turn, last_played_at: last_played_at, details: result[:details])
               when :squashed
+                self.turn = next_turn
                 make_event(:game_over, type: :squashed, who: turn, last_played_at: last_played_at)
               end
             end
