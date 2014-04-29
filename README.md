@@ -42,8 +42,10 @@ You can run:
 # TODO
 
 1. Write documentation.
-2. Show example usage.
-3. Write an example Tic-tac-toe command-line game client.
+2. Show example usage of the grid, engine and ai subclasses.
+3. ~~Write an example Tic-tac-toe command-line game client.~~
+4. In the grid class, call what is now `to_s`, `pretty_print` and rewrite `to_s` to be a single one-line string representation.
+5. Improve test coverage.
 
 # Contributing
 
