@@ -7,12 +7,13 @@ module XO
 
   class Engine
 
-    attr_reader :turn, :state
+    attr_reader :turn, :state, :last_event
 
     def initialize
       @grid = Grid.new
       @turn = :nobody
       @state = :idle
+      @last_event = nil
     end
 
     def grid
@@ -65,7 +66,7 @@ module XO
 
     private
 
-      attr_writer :turn, :state
+      attr_writer :turn, :state, :last_event
 
       def handle_start(player)
         self.turn = player
@@ -120,7 +121,7 @@ module XO
       end
 
       def make_event(name, message = {})
-        { event: name }.merge(message)
+        self.last_event = { event: name }.merge(message)
       end
   end
 end
