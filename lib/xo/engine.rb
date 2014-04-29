@@ -1,4 +1,3 @@
-require 'observer'
 require 'ostruct'
 
 require 'xo/grid'
@@ -7,7 +6,6 @@ require 'xo/evaluator'
 module XO
 
   class Engine
-    include Observable
 
     attr_reader :turn, :state
 
@@ -34,8 +32,6 @@ module XO
       else
         raise NotImplementedError
       end
-
-      self
     end
 
     def stop
@@ -45,8 +41,6 @@ module XO
       else
         raise NotImplementedError
       end
-
-      self
     end
 
     def play(r, c)
@@ -56,8 +50,6 @@ module XO
       else
         raise NotImplementedError
       end
-
-      self
     end
 
     def continue_playing(player)
@@ -69,8 +61,6 @@ module XO
       else
         raise NotImplementedError
       end
-
-      self
     end
 
     private
@@ -82,13 +72,13 @@ module XO
         self.state = :playing
         @grid.clear
 
-        send_event(:game_started, who: player)
+        make_event(:game_started, who: player)
       end
 
       def handle_stop
         self.state = :idle
 
-        send_event(:game_stopped)
+        make_event(:game_stopped)
       end
 
       def handle_play(r, c)
@@ -102,22 +92,22 @@ module XO
             case result[:status]
             when :ok
               self.turn = next_turn
-              send_event(:next_turn, who: turn, last_played_at: last_played_at)
+              make_event(:next_turn, who: turn, last_played_at: last_played_at)
             when :game_over
               self.state = :game_over
 
               case result[:type]
               when :winner
-                send_event(:game_over, type: :winner, who: turn, last_played_at: last_played_at, details: result[:details])
+                make_event(:game_over, type: :winner, who: turn, last_played_at: last_played_at, details: result[:details])
               when :squashed
-                send_event(:game_over, type: :squashed, who: turn, last_played_at: last_played_at)
+                make_event(:game_over, type: :squashed, who: turn, last_played_at: last_played_at)
               end
             end
           else
-            send_event(:invalid_move, type: :occupied)
+            make_event(:invalid_move, type: :occupied)
           end
         else
-          send_event(:invalid_move, type: :out_of_bounds)
+          make_event(:invalid_move, type: :out_of_bounds)
         end
       end
 
@@ -126,12 +116,11 @@ module XO
         self.state = :playing
         @grid.clear
 
-        send_event(:continue_playing, who: player)
+        make_event(:continue_playing, who: player)
       end
 
-      def send_event(name, message = {})
-        changed
-        notify_observers({ event: name }.merge(message))
+      def make_event(name, message = {})
+        { event: name }.merge(message)
       end
   end
 end

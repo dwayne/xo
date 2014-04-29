@@ -36,19 +36,17 @@ module XO
     describe 'a single round of play' do
 
       it 'works as follows' do
-        observer = Object.new
+        engine.start(X)
+        engine.play(1, 1)
+        engine.play(2, 1)
+        engine.play(1, 2)
+        engine.play(2, 2)
 
-        def observer.handle_event(e)
-          if e[:event] == :game_over && e[:type] == :winner
-            @winner = e[:who]
-          end
-        end
+        e = engine.play(1, 3)
 
-        engine.add_observer(observer, :handle_event)
-
-        engine.start(X).play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
-
-        observer.instance_variable_get(:@winner).must_equal X
+        e[:event].must_equal :game_over
+        e[:type].must_equal :winner
+        e[:who].must_equal X
       end
     end
   end
