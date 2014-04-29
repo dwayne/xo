@@ -1,0 +1,201 @@
+#!/usr/bin/env ruby
+#
+# A Tic-tac-toe game client based on xo.
+
+require 'xo'
+
+AUTHOR = "Dwayne Crooks"
+EMAIL  = "me@dwaynecrooks.com"
+
+PROMPT = "> "
+
+def welcome
+  heading = "Welcome to xo! A Tic-tac-toe game client created by #{AUTHOR}."
+
+  puts heading
+  puts "=" * heading.length
+  puts
+
+  puts "NOTE: You can exit the game at anytime by pressing CTRL-C."
+  puts
+end
+
+def display_prompt
+  print PROMPT
+end
+
+def display_start
+  puts
+  puts "Starting..."
+  puts
+end
+
+def ask_for_difficulty_level
+  puts "Please select your difficulty level:"
+  puts "1. Easy"
+  puts "2. Medium"
+  puts "3. Hard"
+
+  get_option({ '1' => :easy, '2' => :medium, '3' => :hard })
+end
+
+def get_ai(level)
+  {
+    :easy   => XO::AI::Novice,
+    :medium => XO::AI::AdvancedBeginner,
+    :hard   => XO::AI::Expert
+  }[level]
+end
+
+def ask_for_token
+  puts "Do you want to play as x or o?"
+
+  get_option({ 'x' => XO::X, 'o' => XO::O })
+end
+
+def ask_to_play_first
+  puts "Do you want to play first (y or n)?"
+
+  get_option({ 'y' => true, 'n' => false })
+end
+
+def ask_to_play_again
+  puts "Do you want to play again (y or n)?"
+
+  get_option({ 'y' => true, 'n' => false })
+end
+
+def get_option(options)
+  display_prompt
+
+  selection = gets.chomp
+
+  if options.key?(selection)
+    options[selection]
+  else
+    get_option(options)
+  end
+end
+
+def play(engine, ai)
+  puts engine.grid
+  puts
+  puts "Your move (enter in the format r, c):"
+
+  r, c = get_move
+
+  e = engine.play(r, c)
+
+  case e[:event]
+  when :next_turn
+    puts
+    puts engine.grid
+    puts
+
+    ai_play(engine, ai)
+  when :game_over
+    puts
+
+    case e[:type]
+    when :winner
+      puts "Congratulations! You won."
+    when :squashed
+      puts "Sorry! Game squashed."
+    end
+
+    puts
+  when :invalid_move
+    puts
+    puts "Sorry! You cannot make that move."
+
+    case e[:type]
+    when :occupied
+      puts "That position is occupied."
+      puts
+    when :out_of_bounds
+      puts "That position is not on the board."
+      puts
+    end
+
+    play(engine, ai)
+  end
+end
+
+def get_move
+  display_prompt
+
+  position = gets.chomp.split(',').map(&:strip).map(&:to_i)
+
+  if position.length == 2
+    position
+  else
+    get_move
+  end
+end
+
+def ai_play(engine, ai)
+  puts "Waiting for the computer to play..."
+
+  position = ai.suggest_moves(engine.grid, engine.turn).shuffle[0]
+
+  e = engine.play(position.row, position.column)
+
+  puts "The computer played at #{position.row}, #{position.column}."
+  puts
+
+  case e[:event]
+  when :next_turn
+    play(engine, ai)
+  when :game_over
+    puts engine.grid
+    puts
+
+    case e[:type]
+    when :winner
+      puts "Sorry! You lost."
+    when :squashed
+      puts "Sorry! Game squashed."
+    end
+
+    puts
+  end
+end
+
+welcome
+
+level      = ask_for_difficulty_level
+player     = ask_for_token
+play_first = ask_to_play_first
+
+ai = get_ai(level)
+engine = XO::Engine.new
+
+display_start
+
+if play_first
+  engine.start(player)
+  play(engine, ai)
+else
+  engine.start(XO.other_player(player))
+end
+
+while engine.state != :game_over
+  player == engine.turn ? play(engine, ai) : ai_play(engine, ai)
+end
+
+play_again = ask_to_play_again
+
+while play_again
+  display_start
+
+  engine.continue_playing(engine.last_event[:who])
+
+  while engine.state != :game_over
+    player == engine.turn ? play(engine, ai) : ai_play(engine, ai)
+  end
+
+  play_again = ask_to_play_again
+end
+
+puts "Thank you for playing."
+puts "Bye!"
