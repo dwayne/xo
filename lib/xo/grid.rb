@@ -200,7 +200,8 @@ module XO
         end
 
         g.split('').map do |ch|
-          ch == 'x' ? X : (ch == 'o' ? O : :e)
+          sym = ch.to_sym
+          sym == X || sym == O ? sym : :e
         end
       end
 
