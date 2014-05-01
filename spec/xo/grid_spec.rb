@@ -85,6 +85,12 @@ module XO
           grid.open?(*pos).must_equal true
         end
       end
+
+      it "only considers the first 9 characters" do
+        grid = Grid.new('         xoxoxoxox')
+
+        grid.empty?.must_equal true
+      end
     end
 
     describe "#dup" do
