@@ -84,7 +84,7 @@ module XO
 
       def handle_play(r, c)
         if Grid.contains?(r, c)
-          if @grid.free?(r, c)
+          if @grid.open?(r, c)
             @grid[r, c] = turn
             last_played_at = OpenStruct.new(row: r, col: c)
 

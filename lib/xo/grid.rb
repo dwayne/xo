@@ -1,54 +1,147 @@
 module XO
 
+  # A data structure for storing X's and O's in a 3x3 grid.
+  #
+  # The grid is structured as follows:
+  #
+  #       column
+  #      1   2   3
+  #  row
+  #   1    |   |
+  #     ---+---+---
+  #   2    |   |
+  #     ---+---+---
+  #   3    |   |
+  #
+  # @note If a position stores anything other than an X or an O then
+  #  that position is considered to be empty.
   class Grid
+
+    X = :x
+    O = :o
 
     ROWS = 3
     COLS = 3
 
+    N = ROWS * COLS
+
+    # Determines whether or not position (r, c) is contained within a 3x3 grid.
+    #
+    # @param r [Integer] the row
+    # @param c [Integer] the column
+    # @return [Boolean] true iff the position is contained within a 3x3 grid
     def self.contains?(r, c)
       r.between?(1, ROWS) && c.between?(1, COLS)
     end
 
-    def initialize
-      @grid = Array.new(ROWS * COLS, :e)
+    # Classifies what is and isn't considered to be a token.
+    #
+    # @param val [Object]
+    # @return [Boolean] true iff val is an X or an O
+    def self.is_token?(val)
+      [X, O].include?(val)
     end
 
+    # Creates a new empty grid by default. You can also create a
+    # prepopulated grid by passing in a string representation.
+    #
+    # @example
+    #  g = Grid.new('xo ox   o')
+    def initialize(g = '')
+      @grid = self.class.from_string(g)
+    end
+
+    # Creates a copy of a given grid. Use #dup to get your copy.
+    #
+    # @example
+    #  g = Grid.new
+    #  g_copy = g.dup
+    #
+    # @param orig [Grid] the original grid
+    # @return [Grid] a copy
     def initialize_copy(orig)
       @grid = orig.instance_variable_get(:@grid).dup
     end
 
+    # Defines equality in terms of the underlying array.
+    def ==(other)
+      return false unless other.instance_of?(self.class)
+      grid == other.instance_variable_get(:@grid)
+    end
+    alias_method :eql?, :==
+
+    # Required if you want to be able to use a grid as a key in a Hash.
+    def hash
+      grid.hash
+    end
+
+    # Are there any tokens on the grid?
+    #
+    # @return [Boolean] true iff there are no tokens on the grid
+    def empty?
+      grid.all? { |val| !self.class.is_token?(val) }
+    end
+
+    # Does every position on the grid have a token?
+    #
+    # @return [Boolean] true iff every position on the grid has a token
+    def full?
+      grid.all? { |val| self.class.is_token?(val) }
+    end
+
+    # Sets position (r, c) to the given value.
+    #
+    # @param r [Integer] the row
+    # @param c [Integer] the column
+    # @param val [Object]
+    # @raise [IndexError] if the position is off the grid
+    # @return [Object] the value it was given
     def []=(r, c, val)
       if self.class.contains?(r, c)
-        grid[idx(r, c)] = val
+        grid[self.class.idx(r, c)] = val
       else
         raise IndexError, "position (#{r}, #{c}) is off the grid"
       end
     end
 
+    # Retrieves the value at the given position (r, c).
+    #
+    # @param r [Integer] the row
+    # @param c [Integer] the column
+    # @raise [IndexError] if the position is off the grid
+    # @return [Object]
     def [](r, c)
       if self.class.contains?(r, c)
-        grid[idx(r, c)]
+        grid[self.class.idx(r, c)]
       else
         raise IndexError, "position (#{r}, #{c}) is off the grid"
       end
     end
 
-    def empty?
-      grid.all? { |val| !XO.is_token?(val) }
+    # Determines whether or not position (r, c) contains a token.
+    #
+    # @param r [Integer] the row
+    # @param c [Integer] the column
+    # @raise [IndexError] if the position is off the grid
+    # @return true iff the position does not contain a token
+    def open?(r, c)
+      !self.class.is_token?(self[r, c])
     end
 
-    def full?
-      grid.all? { |val| XO.is_token?(val) }
-    end
-
-    def free?(r, c)
-      !XO.is_token?(self[r, c])
-    end
-
+    # Removes all tokens from the grid.
     def clear
       grid.fill(:e)
+
+      self
     end
 
+    # Useful for iterating over all the grid elements one position (left to right, top to bottom) at a time.
+    #
+    # @example
+    #  g = Grid.new
+    #  g.each do |r, c, val|
+    #    puts "(#{r}, #{c}) -> #{val}"
+    #  end
     def each
       (1..ROWS).each do |r|
         (1..COLS).each do |c|
@@ -59,31 +152,57 @@ module XO
       self
     end
 
-    def each_free
-      self.each { |r, c, _| yield(r, c) if free?(r, c) }
+    # Useful for iterating over the open positions, i.e. the position without tokens.
+    #
+    # @example
+    #  g = Grid.new
+    #
+    #  g[1, 1] = g[2, 1] = Grid::X
+    #  g[2, 2] = g[3, 1] = Grid::O
+    #
+    #  g.each_open do |r, c|
+    #    puts "(#{r}, #{c}) is open"
+    #  end
+    def each_open
+      self.each { |r, c, _| yield(r, c) if open?(r, c) }
     end
 
-    def ==(other)
-      return false unless other.instance_of?(self.class)
-      grid == other.instance_variable_get(:@grid)
-    end
-    alias_method :eql?, :==
-
-    def hash
-      grid.hash
+    # Returns a string representation of the grid which may be useful
+    # for debugging or serialization.
+    def inspect
+      grid.map { |val| self.class.t(val) }.join
     end
 
+    # Returns a string representation of the grid which may be useful
+    # for display.
     def to_s
-      [" #{t grid[0]} | #{t grid[1]} | #{t grid[2]} ",
+      g = grid.map { |val| self.class.t(val) }
+
+      [" #{g[0]} | #{g[1]} | #{g[2]} ",
        "---+---+---",
-       " #{t grid[3]} | #{t grid[4]} | #{t grid[5]} ",
+       " #{g[3]} | #{g[4]} | #{g[5]} ",
        "---+---+---",
-       " #{t grid[6]} | #{t grid[7]} | #{t grid[8]} "].join("\n")
+       " #{g[6]} | #{g[7]} | #{g[8]} "].join("\n")
     end
 
     private
 
       attr_reader :grid
+
+      def self.from_string(g)
+        g = g.to_s
+        l = g.length
+
+        g = if l < N
+          g + ' ' * (N - l)
+        elsif l > N
+          g[0..N-1]
+        end
+
+        g.split('').map do |ch|
+          ch == 'x' ? X : (ch == 'o' ? O : :e)
+        end
+      end
 
       # Computes the 0-based index of position (r, c) on a 3x3 grid.
       #
@@ -96,12 +215,12 @@ module XO
       #  3    6 | 7 | 8
       #
       # For e.g. idx(2, 3) is 5.
-      def idx(r, c)
+      def self.idx(r, c)
         COLS * (r - 1) + (c - 1)
       end
 
-      def t(val)
-        XO.is_token?(val) ? val : ' '
+      def self.t(val)
+        is_token?(val) ? val : ' '
       end
   end
 end

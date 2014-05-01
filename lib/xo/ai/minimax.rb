@@ -67,7 +67,7 @@ module XO::AI
         @next_states = []
 
         unless is_terminal?
-          grid.each_free do |r, c|
+          grid.each_open do |r, c|
             next_grid = grid.dup
             next_grid[r, c] = player
 
