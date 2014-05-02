@@ -89,7 +89,7 @@ module XO
     # @raise [IllegalStateError] unless it's called in the :init state
     # @return [self]
     def start(turn)
-      raise ArgumentError, "illegal token #{turn}" unless Grid.is_token?(turn)
+      check_turn(turn)
 
       case state
       when :init
@@ -173,7 +173,7 @@ module XO
     # @raise [IllegalStateError] unless it's called in the :game_over state
     # @return [self]
     def continue_playing(turn)
-      raise ArgumentError, "illegal token #{turn}" unless Grid.is_token?(turn)
+      check_turn(turn)
 
       case state
       when :game_over
@@ -234,6 +234,10 @@ module XO
         @grid.clear
 
         set_event(:game_started, type: :continue_playing)
+      end
+
+      def check_turn(turn)
+        raise ArgumentError, "illegal token #{turn}" unless Grid.is_token?(turn)
       end
 
       def reset
