@@ -95,7 +95,7 @@ module XO
       when :init
         handle_start(turn)
       else
-        raise IllegalStateError
+        raise IllegalStateError, "must be in the :init state but state = :#{state}"
       end
     end
 
@@ -112,7 +112,7 @@ module XO
       when :playing, :game_over
         handle_stop
       else
-        raise IllegalStateError
+        raise IllegalStateError, "must be in the :playing or :game_over state but state = :#{state}"
       end
     end
 
@@ -157,7 +157,7 @@ module XO
       when :playing
         handle_play(r, c)
       else
-        raise IllegalStateError
+        raise IllegalStateError, "must be in the :playing state but state = :#{state}"
       end
     end
 
@@ -179,7 +179,7 @@ module XO
       when :game_over
         handle_continue_playing(turn)
       else
-        raise IllegalStateError
+        raise IllegalStateError, "must be in the :game_over state but state = :#{state}"
       end
     end
 
