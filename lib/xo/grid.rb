@@ -1,6 +1,6 @@
 module XO
 
-  # A data structure for storing X's and O's in a 3x3 grid.
+  # A data structure for storing {Grid::X}'s and {Grid::O}'s in a 3x3 grid.
   #
   # The grid is structured as follows:
   #
@@ -13,8 +13,8 @@ module XO
   #     ---+---+---
   #   3    |   |
   #
-  # @note If a position stores anything other than an X or an O then
-  #  that position is considered to be empty.
+  # It is important to note that if a position stores anything other than an
+  # {Grid::X} or an {Grid::O} then that position is considered to be open.
   class Grid
 
     X = :x
@@ -37,7 +37,7 @@ module XO
     # Classifies what is and isn't considered to be a token.
     #
     # @param val [Object]
-    # @return [Boolean] true iff val is an X or an O
+    # @return [Boolean] true iff val is {Grid::X} or {Grid::O}
     def self.is_token?(val)
       [X, O].include?(val)
     end
@@ -45,7 +45,7 @@ module XO
     # Determines the other token to be returned.
     #
     # @param val [Object]
-    # @return [Object] X given O, O given X or the orginal value
+    # @return [Object] {Grid::X} given {Grid::O}, {Grid::O} given {Grid::X} or the orginal value
     def self.other_token(val)
       val == X ? O : (val == O ? X : val)
     end
@@ -59,7 +59,7 @@ module XO
       @grid = self.class.from_string(g)
     end
 
-    # Creates a copy of a given grid. Use #dup to get your copy.
+    # Creates a copy of the given grid. Use #dup to get your copy.
     #
     # @example
     #  g = Grid.new
@@ -143,7 +143,7 @@ module XO
       self
     end
 
-    # Useful for iterating over all the grid elements one position (left to right, top to bottom) at a time.
+    # Useful for iterating over all the positions from left to right and top to bottom.
     #
     # @example
     #  g = Grid.new
@@ -160,7 +160,7 @@ module XO
       self
     end
 
-    # Useful for iterating over the open positions, i.e. the position without tokens.
+    # Used for iterating over all the open positions from left to right and top to bottom.
     #
     # @example
     #  g = Grid.new
