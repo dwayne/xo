@@ -123,10 +123,10 @@ module XO
               it "sets last event" do
                 event = engine.last_event
 
-                event[:name] = :next_turn
-                event[:last_move][:turn] = Grid::X
-                event[:last_move][:r] = 1
-                event[:last_move][:c] = 1
+                event[:name].must_equal :next_turn
+                event[:last_move][:turn].must_equal Grid::X
+                event[:last_move][:r].must_equal 1
+                event[:last_move][:c].must_equal 1
               end
             end
 
@@ -153,12 +153,12 @@ module XO
                 it "sets last event" do
                   event = engine.last_event
 
-                  event[:name] = :game_over
-                  event[:type] = :winner
-                  event[:last_move][:turn] = Grid::X
-                  event[:last_move][:r] = 1
-                  event[:last_move][:c] = 3
-                  event[:details] = [
+                  event[:name].must_equal :game_over
+                  event[:type].must_equal :winner
+                  event[:last_move][:turn].must_equal Grid::X
+                  event[:last_move][:r].must_equal 1
+                  event[:last_move][:c].must_equal 3
+                  event[:details].must_equal [
                     { where: :row, index: 1, positions: [[1, 1], [1, 2], [1, 3]] }
                   ]
                 end
@@ -167,7 +167,7 @@ module XO
               describe "squashed" do
 
                 before do
-                  engine.play(1, 1).play(1, 2).play(1, 3).play(2, 2).play(3, 2).play(2, 1).play(2, 3).play(3, 1).play(3, 3)
+                  engine.play(1, 1).play(1, 2).play(1, 3).play(2, 2).play(3, 2).play(2, 1).play(2, 3).play(3, 3).play(3, 1)
                 end
 
                 it "changes state to :game_over" do
@@ -179,17 +179,17 @@ module XO
                 end
 
                 it "leaves the grid unchanged" do
-                  engine.grid.inspect.must_equal 'xoxooxoxx'
+                  engine.grid.inspect.must_equal 'xoxooxxxo'
                 end
 
                 it "sets last event" do
                   event = engine.last_event
 
-                  event[:name] = :game_over
-                  event[:type] = :squashed
-                  event[:last_move][:turn] = Grid::X
-                  event[:last_move][:r] = 3
-                  event[:last_move][:c] = 3
+                  event[:name].must_equal :game_over
+                  event[:type].must_equal :squashed
+                  event[:last_move][:turn].must_equal Grid::X
+                  event[:last_move][:r].must_equal 3
+                  event[:last_move][:c].must_equal 1
                 end
               end
             end
@@ -200,20 +200,20 @@ module XO
             describe "when given (0, 0)" do
 
               it "sets last event to out of bounds" do
-                event = engine.last_event
+                event = engine.play(0, 0).last_event
 
-                event[:name] = :invalid_move
-                event[:type] = :out_of_bounds
+                event[:name].must_equal :invalid_move
+                event[:type].must_equal :out_of_bounds
               end
             end
 
             describe "when given (1, 1) and it already has a token there" do
 
               it "sets last event to occupied" do
-                event = engine.last_event
+                event = engine.play(1, 1).play(1, 1).last_event
 
-                event[:name] = :invalid_move
-                event[:type] = :occupied
+                event[:name].must_equal :invalid_move
+                event[:type].must_equal :occupied
               end
             end
           end
