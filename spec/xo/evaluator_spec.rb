@@ -4,40 +4,32 @@ module XO
 
   describe Evaluator do
 
-    describe 'analyze' do
+    describe ".analyze" do
 
       let (:grid) { Grid.new }
 
-      describe 'error statuses' do
+      describe "standard play" do
 
-        it 'returns too many moves ahead' do
-          grid[1, 1] = grid[1, 2] = grid[1, 3] = X
-          grid[2, 1] = O
+        it "returns ok" do
+          result = { status: :ok }
 
-          result = { status: :error, type: :too_many_moves_ahead }
+          Evaluator.analyze(grid, Grid::X).must_equal result
+          Evaluator.analyze(grid, Grid::O).must_equal result
 
-          Evaluator.analyze(grid, X).must_equal result
-          Evaluator.analyze(grid, O).must_equal result
-        end
+          grid[1, 1] = Grid::X
 
-        it 'returns two winners' do
-          grid[1, 1] = grid[1, 2] = grid[1, 3] = X
-          grid[2, 1] = grid[2, 2] = grid[2, 3] = O
-
-          result = { status: :error, type: :two_winners }
-
-          Evaluator.analyze(grid, X).must_equal result
-          Evaluator.analyze(grid, O).must_equal result
+          Evaluator.analyze(grid, Grid::X).must_equal result
+          Evaluator.analyze(grid, Grid::O).must_equal result
         end
       end
 
-      describe 'game over statuses' do
+      describe "game over" do
 
-        describe 'wins and losses' do
+        describe "winners and losers" do
 
-          it 'returns a win/loss in the first row' do
-            grid[1, 1] = grid[1, 2] = grid[1, 3] = X
-            grid[2, 1] = grid[2, 2] = O
+          it "returns a row 1 winner/loser" do
+            grid[1, 1] = grid[1, 2] = grid[1, 3] = Grid::X
+            grid[2, 1] = grid[2, 2] = Grid::O
 
             result = {
               status: :game_over,
@@ -49,40 +41,218 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, X).must_equal result
+            Evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, O).must_equal result
+            Evaluator.analyze(grid, Grid::O).must_equal result
           end
 
-          # TODO: Test the winners/losers in the other rows, the columns and the diagonals.
+          it "returns a row 2 winner/loser" do
+            grid[2, 1] = grid[2, 2] = grid[2, 3] = Grid::X
+            grid[1, 1] = grid[1, 2] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :row,
+                index: 2,
+                positions: [[2, 1], [2, 2], [2, 3]]
+              }]
+            }
+
+            Evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            Evaluator.analyze(grid, Grid::O).must_equal result
+          end
+
+          it "returns a row 3 winner/loser" do
+            grid[3, 1] = grid[3, 2] = grid[3, 3] = Grid::X
+            grid[1, 1] = grid[1, 2] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :row,
+                index: 3,
+                positions: [[3, 1], [3, 2], [3, 3]]
+              }]
+            }
+
+            Evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            Evaluator.analyze(grid, Grid::O).must_equal result
+          end
+
+          it "returns a column 1 winner/loser" do
+            grid[1, 1] = grid[2, 1] = grid[3, 1] = Grid::X
+            grid[1, 2] = grid[2, 2] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :column,
+                index: 1,
+                positions: [[1, 1], [2, 1], [3, 1]]
+              }]
+            }
+
+            Evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            Evaluator.analyze(grid, Grid::O).must_equal result
+          end
+
+          it "returns a column 2 winner/loser" do
+            grid[1, 2] = grid[2, 2] = grid[3, 2] = Grid::X
+            grid[1, 1] = grid[2, 1] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :column,
+                index: 2,
+                positions: [[1, 2], [2, 2], [3, 2]]
+              }]
+            }
+
+            Evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            Evaluator.analyze(grid, Grid::O).must_equal result
+          end
+
+          it "returns a column 3 winner/loser" do
+            grid[1, 3] = grid[2, 3] = grid[3, 3] = Grid::X
+            grid[1, 1] = grid[2, 1] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :column,
+                index: 3,
+                positions: [[1, 3], [2, 3], [3, 3]]
+              }]
+            }
+
+            Evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            Evaluator.analyze(grid, Grid::O).must_equal result
+          end
+
+          it "returns a diagonal 1 winner/loser" do
+            grid[1, 1] = grid[2, 2] = grid[3, 3] = Grid::X
+            grid[1, 2] = grid[2, 1] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :diagonal,
+                index: 1,
+                positions: [[1, 1], [2, 2], [3, 3]]
+              }]
+            }
+
+            Evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            Evaluator.analyze(grid, Grid::O).must_equal result
+          end
+
+          it "returns a diagonal 2 winner/loser" do
+            grid[1, 3] = grid[2, 2] = grid[3, 1] = Grid::X
+            grid[1, 2] = grid[2, 3] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :diagonal,
+                index: 2,
+                positions: [[1, 3], [2, 2], [3, 1]]
+              }]
+            }
+
+            Evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            Evaluator.analyze(grid, Grid::O).must_equal result
+          end
         end
 
-        describe 'squashed' do
+        describe "a highly unlikely but definitely possible two-way winner/loser" do
+          # I mean you have to be real messed up to lose a game in this manner. :P
 
-          it 'returns squashed' do
-            grid[1, 1] = grid[1, 2] = grid[2, 3] = grid[3, 1] = grid[3, 3] = X
-            grid[1, 3] = grid[2, 1] = grid[2, 2] = grid[3, 2] = O
+          # The X win
+          it "returns a diagonal 1 and 2 winner/loser" do
+            grid[1, 1] = grid[1, 3] = grid[2, 2] = grid[3, 1] = grid[3, 3] = Grid::X
+            grid[1, 2] = grid[2, 1] = grid[2, 3] = grid[3, 2] = Grid::O
+
+            result = {
+              status: :game_over,
+              type: :winner,
+              details: [{
+                where: :diagonal,
+                index: 1,
+                positions: [[1, 1], [2, 2], [3, 3]]
+              }, {
+                where: :diagonal,
+                index: 2,
+                positions: [[1, 3], [2, 2], [3, 1]]
+              }]
+            }
+          end
+        end
+
+        describe "a squashed grid" do
+
+          it "returns squashed" do
+            grid[1, 1] = grid[1, 2] = grid[2, 3] = grid[3, 1] = grid[3, 3] = Grid::X
+            grid[1, 3] = grid[2, 1] = grid[2, 2] = grid[3, 2] = Grid::O
 
             result = { status: :game_over, type: :squashed }
 
-            Evaluator.analyze(grid, X).must_equal result
-            Evaluator.analyze(grid, O).must_equal result
+            Evaluator.analyze(grid, Grid::X).must_equal result
+            Evaluator.analyze(grid, Grid::O).must_equal result
           end
         end
       end
 
-      describe 'ok status' do
+      describe "invalid token input" do
 
-        it 'returns ok' do
-          result = { status: :ok }
+        it "raises ArgumentError" do
+          proc { Evaluator.analyze(Grid.new, :not_a_token) }.must_raise ArgumentError
+        end
+      end
 
-          Evaluator.analyze(grid, X).must_equal result
-          Evaluator.analyze(grid, O).must_equal result
+      describe "invalid grid input" do
 
-          grid[1, 1] = X
-          Evaluator.analyze(grid, X).must_equal result
-          Evaluator.analyze(grid, O).must_equal result
+        it "returns too many moves ahead" do
+          grid[1, 1] = grid[1, 2] = grid[1, 3] = Grid::X
+          grid[2, 1] = Grid::O
+
+          result = { status: :invalid_grid, type: :too_many_moves_ahead }
+
+          Evaluator.analyze(grid, Grid::X).must_equal result
+          Evaluator.analyze(grid, Grid::O).must_equal result
+        end
+
+        it "returns two winners" do
+          grid[1, 1] = grid[1, 2] = grid[1, 3] = Grid::X
+          grid[2, 1] = grid[2, 2] = grid[2, 3] = Grid::O
+
+          result = { status: :invalid_grid, type: :two_winners }
+
+          Evaluator.analyze(grid, Grid::X).must_equal result
+          Evaluator.analyze(grid, Grid::O).must_equal result
         end
       end
     end
