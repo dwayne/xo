@@ -84,9 +84,9 @@ def play(engine, ai)
 
   r, c = get_move
 
-  e = engine.play(r, c)
+  event = engine.play(r, c).last_event
 
-  case e[:event]
+  case event[:name]
   when :next_turn
     puts
     puts engine.grid
@@ -96,7 +96,7 @@ def play(engine, ai)
   when :game_over
     puts
 
-    case e[:type]
+    case event[:type]
     when :winner
       puts "Congratulations! You won."
     when :squashed
@@ -108,7 +108,7 @@ def play(engine, ai)
     puts
     puts "Sorry! You cannot make that move."
 
-    case e[:type]
+    case event[:type]
     when :occupied
       puts "That position is occupied."
       puts
@@ -138,19 +138,19 @@ def ai_play(engine, ai)
 
   position = ai.suggest_moves(engine.grid, engine.turn).shuffle[0]
 
-  e = engine.play(position.row, position.column)
+  event = engine.play(position.row, position.column).last_event
 
   puts "The computer played at #{position.row}, #{position.column}."
   puts
 
-  case e[:event]
+  case event[:name]
   when :next_turn
     play(engine, ai)
   when :game_over
     puts engine.grid
     puts
 
-    case e[:type]
+    case event[:type]
     when :winner
       puts "Sorry! You lost."
     when :squashed
@@ -188,7 +188,14 @@ play_again = ask_to_play_again
 while play_again
   display_start
 
-  engine.continue_playing(engine.last_event[:who])
+  event = engine.last_event
+
+  case event[:type]
+  when :winner
+    engine.continue_playing(engine.turn)
+  when :squashed
+    engine.continue_playing(engine.next_turn)
+  end
 
   while engine.state != :game_over
     player == engine.turn ? play(engine, ai) : ai_play(engine, ai)

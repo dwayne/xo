@@ -1,128 +1,250 @@
-require 'ostruct'
-
 require 'xo/grid'
 require 'xo/evaluator'
 
 module XO
 
+  # A state machine that encapsulates the game logic for Tic-tac-toe. The operation
+  # of the engine is completely determined by the properties:
+  #
+  # - {#state},
+  # - {#turn},
+  # - {#grid}, and
+  # - {#last_event}.
+  #
+  # The engine can be in one of the 3 following states (represented by a symbol):
+  #
+  # - :init
+  # - :playing
+  # - :game_over
+  #
+  # The engine begins in the :init state. And, the following methods are used to advance
+  # a single game of Tic-tac-toe (and transition the engine between its states) by obeying
+  # the standard rules of Tic-tac-toe:
+  #
+  # - {#start}: [:init]
+  # - {#stop}: [:playing, :game_over]
+  # - {#play}: [:playing]
+  # - {#continue_playing}: [:game_over]
+  #
+  # The array of symbols after each method lists the states in which the method is allowed
+  # to be called.
+  #
+  # @example
+  #  e = Engine.new
+  #  e.start(Grid::X).play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
+  #
+  #  event = e.last_event
+  #  puts event[:name]             # => :game_over
+  #  puts event[:type]             # => :winner
+  #  puts event[:last_move][:turn] # => Grid::X
+  #
+  #  e.continue_playing(Grid::O).play(2, 2).play(1, 1).play(3, 3).play(1, 3).play(1, 2).play(3, 2).play(2, 1).play(2, 3).play(3, 1)
+  #
+  #  event = e.last_event
+  #  puts event[:name]             # => :game_over
+  #  puts event[:type]             # => :squashed
+  #  puts event[:last_move][:turn] # => Grid::O
   class Engine
 
-    attr_reader :turn, :state, :last_event
+    # @return [:init, :playing, :game_over]
+    attr_reader :state
+
+    # @return [Grid::X, Grid::O, :nobody]
+    attr_reader :turn
+
+    # @return [Hash, nil]
+    attr_reader :last_event
 
     def initialize
       @grid = Grid.new
-      @turn = :nobody
-      @state = :idle
-      @last_event = nil
+
+      reset
+
+      set_event(:new)
     end
 
+    # Get the grid that's managed by the engine.
+    #
+    # @return [Grid] a copy of the grid that the engine uses
     def grid
       @grid.dup
     end
 
+    # If the current turn is either {Grid::X}, {Grid::O} or :nobody then
+    # it returns {Grid::O}, {Grid::X}, :nobody respectively.
+    #
+    # @return [Grid::X, Grid::O, :nobody]
     def next_turn
-      XO.other_player(turn)
+      Grid.other_token(turn)
     end
 
-    def start(player)
-      raise ArgumentError, "unknown player #{player}" unless XO.is_player?(player)
+    # Transitions the engine from the :init state into the :playing state.
+    #
+    # Sets the last event to be:
+    #
+    #   { name: :game_started }
+    #
+    # @param turn [Grid::X, Grid::O] the token to have first play
+    # @raise [ArgumentError] unless turn is either {Grid::X} or {Grid::O}
+    # @raise [IllegalStateError] unless it's called in the :init state
+    # @return [self]
+    def start(turn)
+      raise ArgumentError, "illegal token #{turn}" unless Grid.is_token?(turn)
 
       case state
-      when :idle
-        handle_start(player)
+      when :init
+        handle_start(turn)
       else
-        raise NotImplementedError
+        raise IllegalStateError
       end
     end
 
+    # Transitions the engine from the :playing or :game_over state into the :game_over state.
+    #
+    # Sets the last event to be:
+    #
+    #   { name: :game_over }
+    #
+    # @raise [IllegalStateError] unless it's called in the :playing or :game_over state
+    # @return [self]
     def stop
       case state
       when :playing, :game_over
         handle_stop
       else
-        raise NotImplementedError
+        raise IllegalStateError
       end
     end
 
+    # Makes a move at the given position (r, c) which may transition the engine into the :game_over state
+    # or leave it in the :playing state.
+    #
+    # Sets the last event as follows:
+    #
+    # - If the position is out of bounds, then
+    #
+    #     { name: :invalid_move, type: :out_of_bounds }
+    #
+    # - If the position is occupied, then
+    #
+    #     { name: :invalid_move, type: :occupied }
+    #
+    # - If the move was allowed and didn't result in ending the game, then
+    #
+    #     { name: :next_turn, last_move: { turn: :a_token, r: :a_row, c: :a_column } }
+    #
+    # - If the move was allowed and resulted in a win, then
+    #
+    #     { name: :game_over, type: :winner, last_move: { turn: :a_token, r: :a_row, c: :a_column }, details: :the_details }
+    #
+    # - If the move was allowed and resulted in a squashed game, then
+    #
+    #     { name: :game_over, type: :squashed, last_move: { turn: :a_token, r: :a_row, c: :a_column } }
+    #
+    # Legend:
+    #
+    # - :a_token is one of {Grid::X} or {Grid::O}
+    # - :a_row is one of 1, 2 or 3
+    # - :a_column is one of 1, 2 or 3
+    # - :the_details is taken verbatim from the :details key of the returned hash of {Evaluator.analyze}
+    #
+    # @param r [Integer] the row
+    # @param c [Integer] the column
+    # @raise [IllegalStateError] unless it's called in the :playing state
+    # @return [self]
     def play(r, c)
       case state
       when :playing
-        handle_play(r.to_i, c.to_i)
+        handle_play(r, c)
       else
-        raise NotImplementedError
+        raise IllegalStateError
       end
     end
 
-    def continue_playing(player)
-      raise ArgumentError, "unknown player #{player}" unless XO.is_player?(player)
+    # Similar to start but should only be used to play another round when a game has ended. It transitions
+    # the engine from the :game_over state into the :playing state.
+    #
+    # Sets the last event to be:
+    #
+    #   { name: :game_started, type: :continue_playing }
+    #
+    # @param turn [Grid::X, Grid::O] the token to have first play
+    # @raise [ArgumentError] unless turn is either {Grid::X} or {Grid::O}
+    # @raise [IllegalStateError] unless it's called in the :game_over state
+    # @return [self]
+    def continue_playing(turn)
+      raise ArgumentError, "illegal token #{turn}" unless Grid.is_token?(turn)
 
       case state
       when :game_over
-        handle_continue_playing(player)
+        handle_continue_playing(turn)
       else
-        raise NotImplementedError
+        raise IllegalStateError
       end
     end
 
+    # The exception raised by {#start}, {#stop}, {#play} and {#continue_playing} whenever
+    # these methods are called and the engine is in the wrong state.
+    class IllegalStateError < StandardError; end
+
     private
 
-      attr_writer :turn, :state, :last_event
-
-      def handle_start(player)
-        self.turn = player
-        self.state = :playing
+      def handle_start(turn)
+        @state = :playing
+        @turn = turn
         @grid.clear
 
-        make_event(:game_started, who: player)
+        set_event(:game_started)
       end
 
       def handle_stop
-        self.state = :idle
+        reset
 
-        make_event(:game_stopped)
+        set_event(:game_stopped)
       end
 
       def handle_play(r, c)
-        if Grid.contains?(r, c)
-          if @grid.open?(r, c)
-            @grid[r, c] = turn
-            last_played_at = OpenStruct.new(row: r, col: c)
+        return set_event(:invalid_move, type: :out_of_bounds) unless Grid.contains?(r, c)
+        return set_event(:invalid_move, type: :occupied) unless @grid.open?(r, c)
 
-            result = Evaluator.analyze(@grid, turn)
+        @grid[r, c] = turn
+        last_move = { turn: turn, r: r, c: c }
 
-            case result[:status]
-            when :ok
-              self.turn = next_turn
-              make_event(:next_turn, who: turn, last_played_at: last_played_at)
-            when :game_over
-              self.state = :game_over
+        result = Evaluator.analyze(@grid, turn)
 
-              case result[:type]
-              when :winner
-                make_event(:game_over, type: :winner, who: turn, last_played_at: last_played_at, details: result[:details])
-              when :squashed
-                self.turn = next_turn
-                make_event(:game_over, type: :squashed, who: turn, last_played_at: last_played_at)
-              end
-            end
-          else
-            make_event(:invalid_move, type: :occupied)
+        case result[:status]
+        when :ok
+          @turn = next_turn
+          set_event(:next_turn, last_move: last_move)
+        when :game_over
+          @state = :game_over
+
+          case result[:type]
+          when :winner
+            set_event(:game_over, type: :winner, last_move: last_move, details: result[:details])
+          when :squashed
+            set_event(:game_over, type: :squashed, last_move: last_move)
           end
-        else
-          make_event(:invalid_move, type: :out_of_bounds)
         end
       end
 
-      def handle_continue_playing(player)
-        self.turn = player
-        self.state = :playing
+      def handle_continue_playing(turn)
+        @turn = turn
+        @state = :playing
         @grid.clear
 
-        make_event(:continue_playing, who: player)
+        set_event(:game_started, type: :continue_playing)
       end
 
-      def make_event(name, message = {})
-        self.last_event = { event: name }.merge(message)
+      def reset
+        @state = :init
+        @turn = :nobody
+        @grid.clear
+      end
+
+      def set_event(name, message = {})
+        @last_event = { name: name }.merge(message)
+        self
       end
   end
 end
