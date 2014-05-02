@@ -62,6 +62,21 @@ module XO
       end
     end
 
+    describe ".other_token" do
+
+      it "returns O given X" do
+        Grid.other_token(Grid::X).must_equal Grid::O
+      end
+
+      it "returns X given O" do
+        Grid.other_token(Grid::O).must_equal Grid::X
+      end
+
+      it "returns the same value it was given otherwise" do
+        Grid.other_token(:something_else).must_equal :something_else
+      end
+    end
+
     let(:grid) { Grid.new }
 
     describe "an initial grid" do

@@ -42,6 +42,14 @@ module XO
       [X, O].include?(val)
     end
 
+    # Determines the other token to be returned.
+    #
+    # @param val [Object]
+    # @return [Object] X given O, O given X or the orginal value
+    def self.other_token(val)
+      val == X ? O : (val == O ? X : val)
+    end
+
     # Creates a new empty grid by default. You can also create a
     # prepopulated grid by passing in a string representation.
     #
