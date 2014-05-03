@@ -106,6 +106,12 @@ module XO
 
         grid.empty?.must_equal true
       end
+
+      it "can create a grid given exactly 9 characters" do
+        grid = Grid.new('xoxoxoxox')
+
+        grid.full?.must_equal true
+      end
     end
 
     describe "#dup" do

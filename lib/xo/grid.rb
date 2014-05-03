@@ -205,6 +205,8 @@ module XO
           g + ' ' * (N - l)
         elsif l > N
           g[0..N-1]
+        else
+          g
         end
 
         g.split('').map do |ch|
