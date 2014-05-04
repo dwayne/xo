@@ -1,3 +1,4 @@
+require 'xo/ai/geometric_grid'
 require 'xo/ai/minimax'
 require 'xo/ai/expert'
 require 'xo/ai/novice'

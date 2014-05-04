@@ -73,6 +73,18 @@ module XO
       perform_analysis
     end
 
+    # Returns the number of {Grid::X}'s and {Grid::O}'s in the given grid.
+    def self.xos(grid)
+      xs = os = 0
+
+      grid.each do |_, _, val|
+        xs += 1 if val == Grid::X
+        os += 1 if val == Grid::O
+      end
+
+      [xs, os]
+    end
+
     class << self
       private
         attr_reader :grid, :token, :winners
@@ -105,12 +117,7 @@ module XO
       end
 
       def self.moves_ahead
-        xs = os = 0
-
-        grid.each do |_, _, val|
-          xs += 1 if val == Grid::X
-          os += 1 if val == Grid::O
-        end
+        xs, os = xos(grid)
 
         (xs - os).abs
       end

@@ -1,62 +1,65 @@
 require 'spec_helper'
 
-module XO
+module XO::AI
 
-  describe AI do
+  describe Minimax do
 
-    describe 'minimax' do
+    let(:minimax) { Minimax.new }
 
-      let(:grid) { Grid.new }
+    describe "immediate wins" do
 
-      describe 'immediate wins' do
+      it "should return (1, 3)" do
+        grid = XO::Grid.new('xx oo')
 
-        it 'should return (1, 3)' do
-          grid[1, 1] = grid[1, 2] = :x
-          grid[2, 1] = grid[2, 2] = :o
+        moves = minimax.moves(grid, XO::Grid::X)
 
-          moves = AI.minimax(grid, :x).moves
-
-          moves.size.must_equal 1
-          [moves[0].row, moves[0].column].must_equal [1, 3]
-        end
-
-        it 'should return (1, 3), (3, 2) and (3, 3)' do
-          grid[2, 1] = grid[2, 3] = grid[3, 1] = :x
-          grid[1, 1] = grid[1, 2] = grid[2, 2] = :o
-
-          moves = AI.minimax(grid, :o).moves
-
-          moves.size.must_equal 3
-          [moves[0].row, moves[0].column].must_equal [1, 3]
-          [moves[1].row, moves[1].column].must_equal [3, 2]
-          [moves[2].row, moves[2].column].must_equal [3, 3]
-        end
+        moves.must_equal [[1, 3]]
       end
 
-      describe 'blocking moves' do
+      it "should return (1, 3), (3, 2) and (3, 3)" do
+        grid = XO::Grid.new('oo xoxx')
 
-        it 'should return (2, 1)' do
-          grid[1, 1] = grid[3, 1] = :x
-          grid[2, 2] = :o
+        moves = minimax.moves(grid, XO::Grid::O)
 
-          moves = AI.minimax(grid, :o).moves
+        moves.must_equal [[1, 3], [3, 2], [3, 3]]
+      end
+    end
 
-          moves.size.must_equal 1
-          [moves[0].row, moves[0].column].must_equal [2, 1]
-        end
+    describe "blocking moves" do
+
+      it "should return (2, 1)" do
+        grid = XO::Grid.new('x   o x')
+
+        moves = minimax.moves(grid, XO::Grid::O)
+
+        moves.must_equal [[2, 1]]
+      end
+    end
+
+    describe "smart moves" do
+
+      it "should return (1, 3)" do
+        grid = XO::Grid.new('x  o  x o')
+
+        moves = minimax.moves(grid, XO::Grid::X)
+
+        moves.must_equal [[1, 3]]
       end
 
-      describe 'smart moves' do
+      it "should return (1, 2), (2, 1), (2, 3), (3, 2)" do
+        grid = XO::Grid.new('  o x o')
 
-        it 'should return (1, 3)' do
-          grid[1, 1] = grid[3, 1] = :x
-          grid[2, 1] = grid[3, 3] = :o
+        moves = minimax.moves(grid, XO::Grid::X)
 
-          moves = AI.minimax(grid, :x).moves
+        moves.must_equal [[1, 2], [2, 1], [2, 3], [3, 2]]
+      end
 
-          moves.size.must_equal 1
-          [moves[0].row, moves[0].column].must_equal [1, 3]
-        end
+      it "should return (1, 3), (3, 1)" do
+        grid = XO::Grid.new('x   x   o')
+
+        moves = minimax.moves(grid, XO::Grid::O)
+
+        moves.must_equal [[1, 3], [3, 1]]
       end
     end
   end
