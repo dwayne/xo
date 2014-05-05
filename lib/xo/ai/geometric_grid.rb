@@ -145,10 +145,6 @@ module XO
           rotate.rotate.rotate
         end
 
-        def reflections
-          [self, reflect]
-        end
-
         def transformations
           rotations + rotations.map(&:reflect)
         end
