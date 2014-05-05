@@ -9,6 +9,12 @@ EMAIL  = "me@dwaynecrooks.com"
 
 PROMPT = "> "
 
+AI = {
+  easy: XO::AI::Easy.new,
+  medium: XO::AI::Medium.new,
+  hard: XO::AI::Hard.new
+}
+
 def welcome
   heading = "Welcome to xo! A Tic-tac-toe game client created by #{AUTHOR}."
 
@@ -39,18 +45,10 @@ def ask_for_difficulty_level
   get_option({ '1' => :easy, '2' => :medium, '3' => :hard })
 end
 
-def get_ai(level)
-  {
-    :easy   => XO::AI::Novice,
-    :medium => XO::AI::AdvancedBeginner,
-    :hard   => XO::AI::Expert
-  }[level]
-end
-
 def ask_for_token
   puts "Do you want to play as x or o?"
 
-  get_option({ 'x' => XO::X, 'o' => XO::O })
+  get_option({ 'x' => XO::Grid::X, 'o' => XO::Grid::O })
 end
 
 def ask_to_play_first
@@ -136,11 +134,11 @@ end
 def ai_play(engine, ai)
   puts "Waiting for the computer to play..."
 
-  position = ai.suggest_moves(engine.grid, engine.turn).shuffle[0]
+  r, c = ai.moves(engine.grid, engine.turn).shuffle[0]
 
-  event = engine.play(position.row, position.column).last_event
+  event = engine.play(r, c).last_event
 
-  puts "The computer played at #{position.row}, #{position.column}."
+  puts "The computer played at #{r}, #{c}."
   puts
 
   case event[:name]
@@ -167,7 +165,7 @@ level      = ask_for_difficulty_level
 player     = ask_for_token
 play_first = ask_to_play_first
 
-ai = get_ai(level)
+ai = AI[level]
 engine = XO::Engine.new
 
 display_start
@@ -176,7 +174,7 @@ if play_first
   engine.start(player)
   play(engine, ai)
 else
-  engine.start(XO.other_player(player))
+  engine.start(XO::Grid.other_token(player))
 end
 
 while engine.state != :game_over
