@@ -2,15 +2,14 @@ require 'xo/grid'
 
 module XO
 
-  # This module provides an {.analyze} method than can be used to
+  # This module defines an {.analyze} method than can be used to
   # look at a grid and answer the following questions:
   #
-  # 1. Is it a valid grid? A grid is considered valid if it possible
-  #    for two players alternating moves to reach the given grid
-  #    configuration.
+  # 1. Is it a valid grid? A grid is considered valid if it possible for
+  #    two players, taking turns, to reach the given grid configuration.
   # 2. Is there a winner/loser or is the grid squashed?
   # 3. Who is the winner/loser?
-  # 4. Which positions make up the winning row, column or diagonal?
+  # 4. Which positions make up the winning row, column and/or diagonal?
   module Evaluator
 
     # Analyze a given grid assuming that the given token is the one that
@@ -74,6 +73,12 @@ module XO
     end
 
     # Returns the number of {Grid::X}'s and {Grid::O}'s in the given grid.
+    #
+    # @example
+    #  g = Grid.new('xoxxo')
+    #  xs, os = Evaluator.xos(g)
+    #  puts xs # => 3
+    #  puts os # => 2
     def self.xos(grid)
       xs = os = 0
 
