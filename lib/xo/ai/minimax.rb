@@ -10,13 +10,6 @@ module XO
     class Minimax
       include Singleton
 
-      def initialize
-        @the_grid = GeometricGrid.new
-        @scores = {}
-
-        build_tree
-      end
-
       def moves(grid, turn)
         raise ArgumentError, "illegal token #{turn}" unless XO::Grid.is_token?(turn)
 
@@ -26,6 +19,13 @@ module XO
       private
 
         attr_reader :the_grid, :scores
+
+        def initialize
+          @the_grid = GeometricGrid.new
+          @scores = {}
+
+          build_tree
+        end
 
         def build_tree(player = MaxPlayer)
           return if has_score?
