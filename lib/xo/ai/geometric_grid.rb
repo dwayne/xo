@@ -59,8 +59,8 @@ module XO
       # @return [GeometricGrid]
       def rotate
         GeometricGrid.new(
-          "#{self[3, 1]}#{self[2, 1]}#{self[1, 1]}"
-          "#{self[3, 2]}#{self[2, 2]}#{self[1, 2]}"
+          "#{self[3, 1]}#{self[2, 1]}#{self[1, 1]}" +
+          "#{self[3, 2]}#{self[2, 2]}#{self[1, 2]}" +
           "#{self[3, 3]}#{self[2, 3]}#{self[1, 3]}"
         )
       end
@@ -76,8 +76,8 @@ module XO
       # @return [GeometricGrid]
       def reflect
         GeometricGrid.new(
-          "#{self[1, 3]}#{self[1, 2]}#{self[1, 1]}"
-          "#{self[2, 3]}#{self[2, 2]}#{self[2, 1]}"
+          "#{self[1, 3]}#{self[1, 2]}#{self[1, 1]}" +
+          "#{self[2, 3]}#{self[2, 2]}#{self[2, 1]}" +
           "#{self[3, 3]}#{self[3, 2]}#{self[3, 1]}"
         )
       end
