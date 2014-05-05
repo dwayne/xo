@@ -4,7 +4,7 @@ module XO::AI
 
   describe Minimax do
 
-    let(:minimax) { Minimax.new }
+    let(:minimax) { Minimax.instance }
 
     describe "immediate wins" do
 

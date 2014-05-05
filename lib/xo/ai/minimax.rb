@@ -1,3 +1,5 @@
+require 'singleton'
+
 require 'xo/evaluator'
 require 'xo/ai/geometric_grid'
 
@@ -6,6 +8,7 @@ module XO
   module AI
 
     class Minimax
+      include Singleton
 
       def initialize
         @the_grid = GeometricGrid.new
