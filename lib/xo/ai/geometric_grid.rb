@@ -58,10 +58,10 @@ module XO
       #
       # @return [GeometricGrid]
       def rotate
-        GeometricGrid.new(
-          "#{self[3, 1]}#{self[2, 1]}#{self[1, 1]}" +
-          "#{self[3, 2]}#{self[2, 2]}#{self[1, 2]}" +
-          "#{self[3, 3]}#{self[2, 3]}#{self[1, 3]}"
+        transform(
+          [[[3, 1], [2, 1], [1, 1]],
+           [[3, 2], [2, 2], [1, 2]],
+           [[3, 3], [2, 3], [1, 3]]]
         )
       end
 
@@ -75,10 +75,10 @@ module XO
       #
       # @return [GeometricGrid]
       def reflect
-        GeometricGrid.new(
-          "#{self[1, 3]}#{self[1, 2]}#{self[1, 1]}" +
-          "#{self[2, 3]}#{self[2, 2]}#{self[2, 1]}" +
-          "#{self[3, 3]}#{self[3, 2]}#{self[3, 1]}"
+        transform(
+          [[[1, 3], [1, 2], [1, 1]],
+           [[2, 3], [2, 2], [2, 1]],
+           [[3, 3], [3, 2], [3, 1]]]
         )
       end
 
@@ -128,6 +128,16 @@ module XO
       end
 
       private
+
+        def transform(matrix)
+          transformed_grid = GeometricGrid.new
+
+          self.each do |r, c|
+            transformed_grid[r, c] = self[*matrix[r-1][c-1]]
+          end
+
+          transformed_grid
+        end
 
         def rotations
           [self, rot90, rot180, rot270]
