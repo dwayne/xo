@@ -8,28 +8,10 @@ A [Ruby](http://www.ruby-lang.org/en/) library for [Tic-tac-toe](http://en.wikip
 
 ```ruby
 require 'benchmark'
-require 'xo'
+require 'xo/ai/minimax'
 
-# Empty grid
-g = XO::Grid.new
-
-puts Benchmark.measure { XO::AI.minimax(g, :x) }
-# => 0.000000   0.000000   0.000000 (  0.000463)
-# => O(1) time due to caching
-
-# One spot taken
-g[1, 1] = :x
-
-puts Benchmark.measure { XO::AI.minimax(g, :o) }
-# => 0.000000   0.000000   0.000000 (  0.000216)
-# => O(1) time due to caching
-
-# Two spots taken
-g[1, 3] = :o
-
-puts Benchmark.measure { XO::AI.minimax(g, :x) }
-# => 0.690000   0.000000   0.690000 (  0.695095)
-# => Worst-case time, performance only improves from here on as the grid gets filled
+puts Benchmark.measure { XO::AI::Minimax.instance }
+# => 3.620000   0.000000   3.620000 (  3.621734)
 ```
 
 # Testing
@@ -38,14 +20,6 @@ You can run:
 
 - All specs: `bundle exec rake`, or
 - A specific spec: `bundle exec ruby -Ilib -Ispec spec/path_to_spec_file.rb`
-
-# TODO
-
-1. Write documentation.
-2. Show example usage of the grid, engine and ai subclasses.
-3. ~~Write an example Tic-tac-toe command-line game client.~~
-4. ~~In the grid class, call what is now `to_s`, `pretty_print` and rewrite `to_s` to be a single one-line string representation.~~
-5. Improve test coverage.
 
 # Contributing
 
