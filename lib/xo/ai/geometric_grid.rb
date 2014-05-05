@@ -58,21 +58,11 @@ module XO
       #
       # @return [GeometricGrid]
       def rotate
-        g = GeometricGrid.new
-
-        g[1, 1] = self[3, 1]
-        g[1, 2] = self[2, 1]
-        g[1, 3] = self[1, 1]
-
-        g[2, 1] = self[3, 2]
-        g[2, 2] = self[2, 2]
-        g[2, 3] = self[1, 2]
-
-        g[3, 1] = self[3, 3]
-        g[3, 2] = self[2, 3]
-        g[3, 3] = self[1, 3]
-
-        g
+        GeometricGrid.new(
+          "#{self[3, 1]}#{self[2, 1]}#{self[1, 1]}"
+          "#{self[3, 2]}#{self[2, 2]}#{self[1, 2]}"
+          "#{self[3, 3]}#{self[2, 3]}#{self[1, 3]}"
+        )
       end
 
       # Reflect the geometric grid in its vertical axis.
@@ -85,21 +75,11 @@ module XO
       #
       # @return [GeometricGrid]
       def reflect
-        g = GeometricGrid.new
-
-        g[1, 1] = self[1, 3]
-        g[1, 2] = self[1, 2]
-        g[1, 3] = self[1, 1]
-
-        g[2, 1] = self[2, 3]
-        g[2, 2] = self[2, 2]
-        g[2, 3] = self[2, 1]
-
-        g[3, 1] = self[3, 3]
-        g[3, 2] = self[3, 2]
-        g[3, 3] = self[3, 1]
-
-        g
+        GeometricGrid.new(
+          "#{self[1, 3]}#{self[1, 2]}#{self[1, 1]}"
+          "#{self[2, 3]}#{self[2, 2]}#{self[2, 1]}"
+          "#{self[3, 3]}#{self[3, 2]}#{self[3, 1]}"
+        )
       end
 
       # Determines whether or not this geometric grid has the same
