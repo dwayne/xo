@@ -4,11 +4,11 @@ module XO
 
   describe Grid do
 
-    it "specifies an X" do
+    it "defines X" do
       Grid::X.must_equal :x
     end
 
-    it "specifies an O" do
+    it "defines O" do
       Grid::O.must_equal :o
     end
 
@@ -127,30 +127,6 @@ module XO
       end
     end
 
-    describe "equality" do
-
-      it "returns true for equal grids" do
-        Grid.new('xo').must_equal Grid.new('xo')
-      end
-
-      it "return false for unequal grids" do
-        Grid.new('xo').wont_equal Grid.new('xox')
-      end
-    end
-
-    describe "#hash" do
-
-      it "must be properly defined" do
-        a = Grid.new(' x   o ')
-        b = Grid.new(' x   o ')
-
-        # if a == b
-        a.must_equal b
-        # then
-        a.hash.must_equal b.hash
-      end
-    end
-
     describe "#empty?" do
 
       it "returns false when at least one position has a token" do
@@ -185,9 +161,15 @@ module XO
 
     describe "#[]=" do
 
-      it "sets a position to the given value" do
-        grid[2, 1] = :anything
-        grid[2, 1].must_equal :anything
+      it "sets a position to X, O or :e" do
+        grid[2, 1] = Grid::X
+        grid[2, 1].must_equal Grid::X
+
+        grid[2, 2] = Grid::O
+        grid[2, 2].must_equal Grid::O
+
+        grid[2, 3] = :anything_else
+        grid[2, 3].must_equal :e
       end
 
       it "raises IndexError when the position is off the grid" do
@@ -255,10 +237,6 @@ module XO
 
         visited.keys.size.must_equal(Grid::ROWS * Grid::COLS)
       end
-
-      it "returns self" do
-        grid.each {}.must_be_same_as grid
-      end
     end
 
     describe "#each_open" do
@@ -279,10 +257,6 @@ module XO
         [[1, 1], [1, 2], [2, 1], [2, 3], [3, 2], [3, 3]].each do |pos|
           visited.key?(pos)
         end
-      end
-
-      it "returns self" do
-        grid.each_open {}.must_be_same_as grid
       end
     end
 

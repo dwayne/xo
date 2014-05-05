@@ -1,20 +1,20 @@
 module XO
 
-  # A data structure for storing {Grid::X}'s and {Grid::O}'s in a 3x3 grid.
+  # A data structure for storing {X}'s and {O}'s in a 3x3 grid.
   #
   # The grid is structured as follows:
   #
-  #       column
-  #      1   2   3
-  #  row
-  #   1    |   |
-  #     ---+---+---
-  #   2    |   |
-  #     ---+---+---
-  #   3    |   |
+  #        column
+  #       1   2   3
+  #   row
+  #    1    |   |
+  #      ---+---+---
+  #    2    |   |
+  #      ---+---+---
+  #    3    |   |
   #
-  # It is important to note that if a position stores anything other than an
-  # {Grid::X} or an {Grid::O} then that position is considered to be open.
+  # It is important to note that if a position stores anything other than
+  # {X} or {O} then that position is considered to be open.
   class Grid
 
     X = :x
@@ -25,7 +25,7 @@ module XO
 
     N = ROWS * COLS
 
-    # Determines whether or not position (r, c) is contained within a 3x3 grid.
+    # Determines whether or not position (r, c) is such that 1 <= r <= 3 and 1 <= c <= 3.
     #
     # @param r [Integer] the row
     # @param c [Integer] the column
@@ -37,15 +37,15 @@ module XO
     # Classifies what is and isn't considered to be a token.
     #
     # @param val [Object]
-    # @return [Boolean] true iff val is {Grid::X} or {Grid::O}
+    # @return [Boolean] true iff val is {X} or {O}
     def self.is_token?(val)
-      [X, O].include?(val)
+      val == X || val == O
     end
 
-    # Determines the other token to be returned.
+    # Determines the other token.
     #
     # @param val [Object]
-    # @return [Object] {Grid::X} given {Grid::O}, {Grid::O} given {Grid::X} or the orginal value
+    # @return [Object] {X} given {O}, {O} given {X} or the original value
     def self.other_token(val)
       val == X ? O : (val == O ? X : val)
     end
@@ -71,26 +71,14 @@ module XO
       @grid = orig.instance_variable_get(:@grid).dup
     end
 
-    # Defines equality in terms of the underlying array.
-    def ==(other)
-      return false unless other.instance_of?(self.class)
-      grid == other.instance_variable_get(:@grid)
-    end
-    alias_method :eql?, :==
-
-    # Required if you want to be able to use a grid as a key in a Hash.
-    def hash
-      grid.hash
-    end
-
-    # Are there any tokens on the grid?
+    # Determines whether or not there are any tokens on the grid.
     #
     # @return [Boolean] true iff there are no tokens on the grid
     def empty?
       grid.all? { |val| !self.class.is_token?(val) }
     end
 
-    # Does every position on the grid have a token?
+    # Determines whether or not every position on the grid has a token?
     #
     # @return [Boolean] true iff every position on the grid has a token
     def full?
@@ -106,7 +94,7 @@ module XO
     # @return [Object] the value it was given
     def []=(r, c, val)
       if self.class.contains?(r, c)
-        grid[self.class.idx(r, c)] = val
+        grid[self.class.idx(r, c)] = self.class.is_token?(val) ? val : :e
       else
         raise IndexError, "position (#{r}, #{c}) is off the grid"
       end
@@ -143,7 +131,7 @@ module XO
       self
     end
 
-    # Useful for iterating over all the positions from left to right and top to bottom.
+    # Used for iterating over all the positions of the grid from left to right and top to bottom.
     #
     # @example
     #  g = Grid.new
@@ -156,11 +144,9 @@ module XO
           yield(r, c, self[r, c])
         end
       end
-
-      self
     end
 
-    # Used for iterating over all the open positions from left to right and top to bottom.
+    # Used for iterating over all the open positions of the grid from left to right and top to bottom.
     #
     # @example
     #  g = Grid.new
@@ -176,7 +162,7 @@ module XO
     end
 
     # Returns a string representation of the grid which may be useful
-    # for debugging or serialization.
+    # for debugging.
     def inspect
       grid.map { |val| self.class.t(val) }.join
     end
