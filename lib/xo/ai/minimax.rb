@@ -49,6 +49,14 @@ module XO
     #
     # It is interesting to note that B is simply a reflection of A and so will end up having the same value. The algorithm below is
     # smart enough to recognize that and so it will not have to perform a similar calculation in B's case.
+    #
+    # The Minimax class is a Singleton class. You use it as follows:
+    #
+    # @example
+    #  Minimax.instance.moves(XO::Grid.new('xox x o o'), XO::Grid::O) # => [[3, 2]]
+    #
+    # The first time the instance of Minimax is created, it runs the minimax algorithm to compute the value of all the nodes in the
+    # search space. This of course takes a bit of time (~ 4 seconds), but subsequent calls are instantaneous.
     class Minimax
       include Singleton
 
