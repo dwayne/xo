@@ -52,9 +52,11 @@ module XO
     # @return [Grid::X, Grid::O, :nobody]
     attr_reader :turn
 
-    # @return [Hash, nil]
+    # @return [Hash]
     attr_reader :last_event
 
+    # Creates a new {Engine} with its state set to :init, turn set to :nobody, an empty grid and
+    # last_event set to { name: :new }.
     def initialize
       @grid = Grid.new
 
