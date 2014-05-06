@@ -74,6 +74,10 @@ module XO::AI
           proc { minimax.moves(XO::Grid.new(input[0]), input[1]) }.must_raise ArgumentError
         end
       end
+
+      it "returns [] for a terminal grid" do
+        minimax.moves(XO::Grid.new('xx ooo'), XO::Grid::X).must_equal []
+      end
     end
   end
 end
