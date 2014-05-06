@@ -26,15 +26,32 @@ puts g # =>  x | x |
 Evaluator.analyze(g, Grid::X) # => { status: :ok }
 
 g[1, 3] = Grid::X
-Evaluator.analyze(g, Grid::X) # => { status: :game_over, type: :winner, details: [{ where: :row, index: 1, positions: [[1, 1], [1, 2], [1, 3]] }] }
-Evaluator.analyze(g, Grid::O) # => { status: :game_over, type: :loser, details: [{ where: :row, index: 1, positions: [[1, 1], [1, 2], [1, 3]] }] }
+Evaluator.analyze(g, Grid::X) # => { status: :game_over,
+                              #      type: :winner,
+                              #      details: [{
+                              #        where: :row,
+                              #        index: 1,
+                              #        positions: [[1, 1], [1, 2], [1, 3]]
+                              #      }]
+                              #    }
+
+Evaluator.analyze(g, Grid::O) # => { status: :game_over,
+                              #      type: :loser,
+                              #      details: [{
+                              #        where: :row,
+                              #        index: 1,
+                              #        positions: [[1, 1], [1, 2], [1, 3]]
+                              #      }]
+                              #    }
 ```
 
 The problem with managing the grid yourself is that there is nothing stopping you from making bad moves. For example, playing twice.
 
 ```ruby
 g = Grid.new('xx')
-Evaluator.analyze(g, Grid::O) # => { status: :invalid_grid, type: :too_many_moves_ahead }
+Evaluator.analyze(g, Grid::O) # => { status: :invalid_grid,
+                              #      type: :too_many_moves_ahead
+                              #    }
 ```
 
 To avoid such situations, let the engine handle game play. Once you tell it who plays first, then it ensures that the game play follows the rules of [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
@@ -42,8 +59,15 @@ To avoid such situations, let the engine handle game play. Once you tell it who 
 ```ruby
 e = Engine.new
 e.start(Grid::O).play(2, 1).play(1, 1).play(2, 2).play(1, 2).play(2, 3)
-e.last_event # => { name: :game_over, type: :winner, last_move: { turn: :o, r: 2, c: 3 },
-             #      details: [{ where: :row, index: 2, positions: [[2, 1], [2, 2], [2, 3]] }] }
+e.last_event # => { name: :game_over,
+             #      type: :winner,
+             #      last_move: { turn: :o, r: 2, c: 3 },
+             #      details: [{
+             #        where: :row,
+             #        index: 2,
+             #        positions: [[2, 1], [2, 2], [2, 3]]
+             #      }]
+             #    }
 ```
 
 I quickly built a [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe) client that uses the engine and all the other abstractions in this library. See how everything comes together by viewing its implementation right [here](https://github.com/dwayne/xo/blob/master/bin/xo).
