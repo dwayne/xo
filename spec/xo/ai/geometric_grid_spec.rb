@@ -6,68 +6,6 @@ module XO::AI
 
     let(:grid) { GeometricGrid.new }
 
-    describe "the methods it delegates to XO::Grid" do
-
-      it "responds to #empty?" do
-        grid.must_respond_to :empty?
-      end
-
-      it "responds to #full?" do
-        grid.must_respond_to :full?
-      end
-
-      it "responds to #[]=" do
-        grid.must_respond_to :[]=
-      end
-
-      it "responds to #[]" do
-        grid.must_respond_to :[]
-      end
-
-      it "responds to #open?" do
-        grid.must_respond_to :open?
-      end
-
-      it "responds to #clear" do
-        grid.must_respond_to :clear
-      end
-
-      it "responds to #each" do
-        grid.must_respond_to :each
-      end
-
-      it "responds to #each_open" do
-        grid.must_respond_to :each_open
-      end
-
-      it "responds to #inspect" do
-        grid.must_respond_to :inspect
-      end
-
-      it "responds to #to_s" do
-        grid.must_respond_to :to_s
-      end
-    end
-
-    describe "#standard_grid" do
-
-      it "must have the same occupied positions" do
-        grid[1, 1] = XO::Grid::X
-        grid.same?(grid.standard_grid).must_equal true
-      end
-
-      it "must be a non-geometric grid" do
-        grid.standard_grid.must_be_instance_of XO::Grid
-      end
-
-      it "must be a copy" do
-        g = grid.standard_grid
-        h = grid.standard_grid
-
-        g.object_id.wont_equal h.object_id
-      end
-    end
-
     describe "#rotate" do
 
       let (:grid) { GeometricGrid.new("xoooxxoxo") }
@@ -183,9 +121,9 @@ module XO::AI
       end
     end
 
-    describe "usage within a hash" do
+    describe "when used within a hash" do
 
-      it "must be the case that equivalent grids map to the same key in a Hash" do
+      it "must be the case that equivalent grids map to the same key" do
         a = GeometricGrid.new('x')
         b = GeometricGrid.new('  x')
 

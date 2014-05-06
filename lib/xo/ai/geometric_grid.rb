@@ -1,52 +1,15 @@
-require 'forwardable'
-
 require 'xo/grid'
 
 module XO
 
   module AI
 
-    # A geometric grid is like a Tic-tac-toe grid ({XO::Grid}) but with the added benefit
-    # that various geometric transformations (rotation and reflection) can be applied. It
-    # defines a concept of equivalence under these transformations. Geometric grids can be
-    # checked for equality and they define a hash function that allows them to be used in
-    # a Hash.
-    class GeometricGrid
-      extend Forwardable
-
-      # Creates a new empty geometric grid by default. You can also create a
-      # prepopulated grid by passing in a string representation.
-      #
-      # @example
-      #  g = GeometricGrid.new('xo ox   o')
-      def initialize(g = '')
-        @grid = Grid.new(g)
-      end
-
-      # Creates a copy of the given geometric grid. Use #dup to get your copy.
-      #
-      # @example
-      #  g = GeometricGrid.new
-      #  g_copy = g.dup
-      #
-      # @param orig [GeometricGrid] the original grid
-      # @return [GeometricGrid] a copy
-      def initialize_copy(orig)
-        @grid = orig.instance_variable_get(:@grid).dup
-      end
-
-      # Returns a copy of the underlying non-geometric grid.
-      def standard_grid
-        @grid.dup
-      end
-
-      def_delegators :@grid,
-        :empty?, :full?,
-        :[]=, :[],
-        :open?,
-        :clear,
-        :each, :each_open,
-        :inspect, :to_s
+    # A geometric grid is a Tic-tac-toe grid ({XO::Grid}) with the added benefit that
+    # various geometric transformations (rotation and reflection) can be applied. It
+    # defines a concept of equivalence under these transformations. Geometric grids can
+    # be checked for equality and they define a hash function that allows them to be
+    # used as keys within a Hash.
+    class GeometricGrid < XO::Grid
 
       # Rotate the geometric grid clockwise by 90 degrees.
       #
@@ -83,12 +46,9 @@ module XO
       end
 
       # Determines whether or not this geometric grid has the same
-      # occupied positions as the given grid.
+      # occupied positions as the given geometric grid.
       #
-      # @note The other grid need not be geometric. It just needs to
-      #  respond to #inspect, which every object does.
-      #
-      # @param other [#inspect]
+      # @param other [GeometricGrid]
       # @return [Boolean]
       def same?(other)
         self.inspect == other.inspect
@@ -129,6 +89,10 @@ module XO
 
       private
 
+        def transformations
+          rotations + rotations.map(&:reflect)
+        end
+
         def rotations
           [self, rot90, rot180, rot270]
         end
@@ -143,10 +107,6 @@ module XO
 
         def rot270
           rotate.rotate.rotate
-        end
-
-        def transformations
-          rotations + rotations.map(&:reflect)
         end
     end
   end
