@@ -62,5 +62,18 @@ module XO::AI
         moves.must_equal [[1, 3], [3, 1]]
       end
     end
+
+    describe "moves" do
+
+      it "raises ArgumentError if turn is not a token" do
+        proc { minimax.moves(XO::Grid.new, :not_a_token) }.must_raise ArgumentError
+      end
+
+      it "raises ArgumentError for an invalid grid and/or turn combination" do
+        [['x', XO::Grid::X], ['xoo', XO::Grid::O], ['oo', XO::Grid::O], ['xx', XO::Grid::X]].each do |input|
+          proc { minimax.moves(XO::Grid.new(input[0]), input[1]) }.must_raise ArgumentError
+        end
+      end
+    end
   end
 end

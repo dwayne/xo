@@ -11,7 +11,7 @@ module XO
       include Singleton
 
       def moves(grid, turn)
-        raise ArgumentError, "illegal token #{turn}" unless XO::Grid.is_token?(turn)
+        raise ArgumentError, "illegal token #{turn}" unless GeometricGrid.is_token?(turn)
 
         best_moves(*lift(grid, turn))
       end
@@ -73,7 +73,7 @@ module XO
         module MaxPlayer
 
           def self.token
-            XO::Grid::X
+            GeometricGrid::X
           end
 
           def self.other
@@ -92,7 +92,7 @@ module XO
         module MinPlayer
 
           def self.token
-            XO::Grid::O
+            GeometricGrid::O
           end
 
           def self.other
@@ -113,17 +113,21 @@ module XO
         def lift(grid, turn)
           xs, os = Evaluator.xos(grid)
 
-          if turn == XO::Grid::X
+          if turn == GeometricGrid::X
             if xs == os
-              [GeometricGrid.new(grid.inspect), XO::Grid::X]
-            else # xs < os, can't be xs > os since that's an invalid situation
-              [invert(grid), XO::Grid::O]
+              [GeometricGrid.new(grid.inspect), GeometricGrid::X]
+            elsif xs < os
+              [invert(grid), GeometricGrid::O]
+            else
+              raise ArgumentError, "#{grid} and #{turn} is not a valid combination"
             end
           else
             if xs == os
-              [invert(grid), XO::Grid::X]
-            else # xs > os, can't be xs < os since that's an invalid situation
-              [GeometricGrid.new(grid.inspect), XO::Grid::O]
+              [invert(grid), GeometricGrid::X]
+            elsif xs > os
+              [GeometricGrid.new(grid.inspect), GeometricGrid::O]
+            else
+              raise ArgumentError, "#{grid} and #{turn} is not a valid combination"
             end
           end
         end
@@ -132,7 +136,7 @@ module XO
           inverted_grid = GeometricGrid.new
 
           grid.each do |r, c, val|
-            inverted_grid[r, c] = XO::Grid.other_token(val)
+            inverted_grid[r, c] = GeometricGrid.other_token(val)
           end
 
           inverted_grid
