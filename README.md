@@ -4,7 +4,7 @@
 
 A [Ruby](http://www.ruby-lang.org/en/) library for [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
 
-The code is well documented and fully tested, so please have a [read of the documentation](http://rubydoc.info/github/dwayne/xo) and take a [look at the tests](https://github.com/dwayne/xo/tree/master/spec/xo). If you're interested to see my [sublime](https://www.google.tt/search?q=define%3A+sublime) (in my humble opinion :D) implementation of the [Minimax algorithm](http://en.wikipedia.org/wiki/Minimax#Minimax_algorithm_with_alternate_moves) then view it [here](https://github.com/dwayne/xo/blob/master/lib/xo/ai/minimax.rb#L23). It uses the concept of a [geometric grid](https://github.com/dwayne/xo/blob/master/lib/xo/ai/geometric_grid.rb) to acheive its speed up.
+The code is well documented and fully tested, so please have a [read of the documentation](http://rubydoc.info/github/dwayne/xo) and take a [look at the tests](https://github.com/dwayne/xo/tree/master/spec/xo). If you're interested to see my [sublime](https://www.google.tt/search?q=define%3A+sublime) (in my humble opinion :sunglasses:) implementation of the [Minimax algorithm](http://en.wikipedia.org/wiki/Minimax#Minimax_algorithm_with_alternate_moves) then view it [here](https://github.com/dwayne/xo/blob/master/lib/xo/ai/minimax.rb#L23). It uses the concept of a [geometric grid](https://github.com/dwayne/xo/blob/master/lib/xo/ai/geometric_grid.rb) to acheive its speed up.
 
 ## Example usage
 
