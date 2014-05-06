@@ -10,7 +10,7 @@ The code is well documented and fully tested, so please have a [read of the docu
 
 Managing the grid yourself.
 
-```
+```ruby
 require 'xo'
 
 include XO
@@ -32,14 +32,14 @@ Evaluator.analyze(g, Grid::O) # => { status: :game_over, type: :loser, details: 
 
 The problem with managing the grid yourself is that there is nothing stopping you from making bad moves. For example, playing twice.
 
-```
+```ruby
 g = Grid.new('xx')
 Evaluator.analyze(g, Grid::O) # => { status: :invalid_grid, type: :too_many_moves_ahead }
 ```
 
 To avoid such situations, let the engine handle game play. Once you tell it who plays first, then it ensures that the game play follows the rules of Tic-tac-toe.
 
-```
+```ruby
 e = Engine.new
 e.start(Grid::O).play(2, 1).play(1, 1).play(2, 2).play(1, 2).play(2, 3)
 e.last_event # => { name: :game_over, type: :winner, last_move: { turn: :o, r: 2, c: 3 },
