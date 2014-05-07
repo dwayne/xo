@@ -1,3 +1,5 @@
 *.gem
+.ruby-gemset
+.ruby-version
 .yardoc
 /coverage
