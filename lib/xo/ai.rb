@@ -1,6 +1,2 @@
 require 'xo/ai/geometric_grid'
 require 'xo/ai/minimax'
-require 'xo/ai/player'
-require 'xo/ai/easy'
-require 'xo/ai/medium'
-require 'xo/ai/hard'
