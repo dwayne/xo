@@ -6,6 +6,7 @@ module XO
 
     describe ".analyze" do
 
+      let (:evaluator) { Evaluator.instance }
       let (:grid) { Grid.new }
 
       describe "standard play" do
@@ -13,13 +14,13 @@ module XO
         it "returns ok" do
           result = { status: :ok }
 
-          Evaluator.analyze(grid, Grid::X).must_equal result
-          Evaluator.analyze(grid, Grid::O).must_equal result
+          evaluator.analyze(grid, Grid::X).must_equal result
+          evaluator.analyze(grid, Grid::O).must_equal result
 
           grid[1, 1] = Grid::X
 
-          Evaluator.analyze(grid, Grid::X).must_equal result
-          Evaluator.analyze(grid, Grid::O).must_equal result
+          evaluator.analyze(grid, Grid::X).must_equal result
+          evaluator.analyze(grid, Grid::O).must_equal result
         end
       end
 
@@ -41,10 +42,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
 
           it "returns a row 2 winner/loser" do
@@ -61,10 +62,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
 
           it "returns a row 3 winner/loser" do
@@ -81,10 +82,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
 
           it "returns a column 1 winner/loser" do
@@ -101,10 +102,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
 
           it "returns a column 2 winner/loser" do
@@ -121,10 +122,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
 
           it "returns a column 3 winner/loser" do
@@ -141,10 +142,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
 
           it "returns a diagonal 1 winner/loser" do
@@ -161,10 +162,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
 
           it "returns a diagonal 2 winner/loser" do
@@ -181,10 +182,10 @@ module XO
               }]
             }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
 
             result[:type] = :loser
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
         end
 
@@ -220,8 +221,8 @@ module XO
 
             result = { status: :game_over, type: :squashed }
 
-            Evaluator.analyze(grid, Grid::X).must_equal result
-            Evaluator.analyze(grid, Grid::O).must_equal result
+            evaluator.analyze(grid, Grid::X).must_equal result
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
         end
       end
@@ -229,7 +230,7 @@ module XO
       describe "invalid token input" do
 
         it "raises ArgumentError" do
-          proc { Evaluator.analyze(Grid.new, :not_a_token) }.must_raise ArgumentError
+          proc { evaluator.analyze(Grid.new, :not_a_token) }.must_raise ArgumentError
         end
       end
 
@@ -241,8 +242,8 @@ module XO
 
           result = { status: :invalid_grid, type: :too_many_moves_ahead }
 
-          Evaluator.analyze(grid, Grid::X).must_equal result
-          Evaluator.analyze(grid, Grid::O).must_equal result
+          evaluator.analyze(grid, Grid::X).must_equal result
+          evaluator.analyze(grid, Grid::O).must_equal result
         end
 
         it "returns two winners" do
@@ -251,8 +252,8 @@ module XO
 
           result = { status: :invalid_grid, type: :two_winners }
 
-          Evaluator.analyze(grid, Grid::X).must_equal result
-          Evaluator.analyze(grid, Grid::O).must_equal result
+          evaluator.analyze(grid, Grid::X).must_equal result
+          evaluator.analyze(grid, Grid::O).must_equal result
         end
       end
     end

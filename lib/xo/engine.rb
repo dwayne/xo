@@ -212,7 +212,7 @@ module XO
         @grid[r, c] = turn
         last_move = { turn: turn, r: r, c: c }
 
-        result = Evaluator.analyze(@grid, turn)
+        result = Evaluator.instance.analyze(@grid, turn)
 
         case result[:status]
         when :ok
