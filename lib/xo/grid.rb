@@ -50,13 +50,16 @@ module XO
       val == X ? O : (val == O ? X : val)
     end
 
+    attr_reader :grid
+    private :grid
+
     # Creates a new empty grid by default. You can also create a
     # prepopulated grid by passing in a string representation.
     #
     # @example
     #  g = Grid.new('xo ox   o')
     def initialize(g = '')
-      @grid = self.class.from_string(g)
+      @grid = from_string(g)
     end
 
     # Creates a copy of the given grid. Use #dup to get your copy.
@@ -94,7 +97,7 @@ module XO
     # @return [Object] the value it was given
     def []=(r, c, val)
       if self.class.contains?(r, c)
-        grid[self.class.idx(r, c)] = self.class.is_token?(val) ? val : :e
+        grid[idx(r, c)] = self.class.is_token?(val) ? val : :e
       else
         raise IndexError, "position (#{r}, #{c}) is off the grid"
       end
@@ -108,7 +111,7 @@ module XO
     # @return [Object]
     def [](r, c)
       if self.class.contains?(r, c)
-        grid[self.class.idx(r, c)]
+        grid[idx(r, c)]
       else
         raise IndexError, "position (#{r}, #{c}) is off the grid"
       end
@@ -164,13 +167,13 @@ module XO
     # Returns a string representation of the grid which may be useful
     # for debugging.
     def inspect
-      grid.map { |val| self.class.t(val) }.join
+      grid.map { |val| t(val) }.join
     end
 
     # Returns a string representation of the grid which may be useful
     # for display.
     def to_s
-      g = grid.map { |val| self.class.t(val) }
+      g = grid.map { |val| t(val) }
 
       [" #{g[0]} | #{g[1]} | #{g[2]} ",
        "---+---+---",
@@ -181,9 +184,7 @@ module XO
 
     private
 
-      attr_reader :grid
-
-      def self.from_string(g)
+      def from_string(g)
         g = g.to_s
         l = g.length
 
@@ -212,12 +213,12 @@ module XO
       #  3    6 | 7 | 8
       #
       # For e.g. idx(2, 3) is 5.
-      def self.idx(r, c)
+      def idx(r, c)
         COLS * (r - 1) + (c - 1)
       end
 
-      def self.t(val)
-        is_token?(val) ? val : ' '
+      def t(val)
+        self.class.is_token?(val) ? val : ' '
       end
   end
 end
