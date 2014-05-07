@@ -70,12 +70,8 @@ module XO
     # @raise [ArgumentError] unless token is either {Grid::X} or {Grid::O}
     # @return [Hash]
     def analyze(grid, token)
-      raise ArgumentError, "illegal token #{token}" unless Grid.is_token?(token)
-
-      @grid = grid
-      @token = token
-      @winners = {}
-
+      check_token(token)
+      init_analyzer(grid, token)
       perform_analysis
     end
 
@@ -102,6 +98,16 @@ module XO
     private
 
       attr_reader :grid, :token, :winners
+
+      def check_token(token)
+        raise ArgumentError, "illegal token #{token}" unless Grid.is_token?(token)
+      end
+
+      def init_analyzer(grid, token)
+        @grid = grid
+        @token = token
+        @winners = {}
+      end
 
       def perform_analysis
         return { status: :invalid_grid, type: :too_many_moves_ahead } if two_or_more_moves_ahead?
