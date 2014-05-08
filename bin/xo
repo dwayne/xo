@@ -250,7 +250,7 @@ def ask_to_play_again
 end
 
 def get_option(options)
-  print '> '
+  print "> "
 
   selection = gets.chomp
 
