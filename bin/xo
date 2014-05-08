@@ -3,17 +3,59 @@
 # A Tic-tac-toe game client based on xo.
 
 require 'xo'
+include XO
 
 AUTHOR = "Dwayne Crooks"
 EMAIL  = "me@dwaynecrooks.com"
 
 PROMPT = "> "
 
-AI = {
-  easy: XO::AI::Easy.new,
-  medium: XO::AI::Medium.new,
-  hard: XO::AI::Hard.new
-}
+class Player
+
+  def moves(grid, turn)
+    raise NotImplementedError
+  end
+
+  private
+
+    def all_open_moves(grid)
+      moves = []
+
+      grid.each_open do |r, c|
+        moves << [r, c]
+      end
+
+      moves
+    end
+
+    def all_smart_moves(grid, turn)
+      AI::Minimax.instance.moves(grid, turn)
+    end
+end
+
+class Easy < Player
+
+  def moves(grid, turn)
+    all_open_moves(grid)
+  end
+end
+
+class Medium < Player
+
+  def moves(grid, turn)
+    smart_moves = all_smart_moves(grid, turn)
+    dumb_moves = all_open_moves(grid) - smart_moves
+
+    dumb_moves.empty? ? smart_moves : (rand < 0.75 ? smart_moves : dumb_moves)
+  end
+end
+
+class Hard < Player
+
+  def moves(grid, turn)
+    all_smart_moves(grid, turn)
+  end
+end
 
 def welcome
   heading = "Welcome to xo! A Tic-tac-toe game client created by #{AUTHOR}."
@@ -42,13 +84,13 @@ def ask_for_difficulty_level
   puts "2. Medium"
   puts "3. Hard"
 
-  get_option({ '1' => :easy, '2' => :medium, '3' => :hard })
+  get_option({ '1' => Easy, '2' => Medium, '3' => Hard })
 end
 
 def ask_for_token
   puts "Do you want to play as x or o?"
 
-  get_option({ 'x' => XO::Grid::X, 'o' => XO::Grid::O })
+  get_option({ 'x' => Grid::X, 'o' => Grid::O })
 end
 
 def ask_to_play_first
@@ -165,8 +207,8 @@ level      = ask_for_difficulty_level
 player     = ask_for_token
 play_first = ask_to_play_first
 
-ai = AI[level]
-engine = XO::Engine.new
+ai = level.new
+engine = Engine.new
 
 display_start
 
@@ -174,7 +216,7 @@ if play_first
   engine.start(player)
   play(engine, ai)
 else
-  engine.start(XO::Grid.other_token(player))
+  engine.start(Grid.other_token(player))
 end
 
 while engine.state != :game_over
