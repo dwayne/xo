@@ -20,11 +20,11 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 1.9.3'
 
-  spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'minitest'
-  spec.add_development_dependency 'coveralls'
+  spec.add_development_dependency 'rake', '~> 10.3'
+  spec.add_development_dependency 'minitest', '~> 5.3'
+  spec.add_development_dependency 'coveralls', '~> 0.7'
 
   # For documentation
-  spec.add_development_dependency 'redcarpet'
-  spec.add_development_dependency 'yard'
+  spec.add_development_dependency 'redcarpet', '~> 3.1'
+  spec.add_development_dependency 'yard', '~> 0.8'
 end

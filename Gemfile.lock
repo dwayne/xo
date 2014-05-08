@@ -35,9 +35,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  coveralls
-  minitest
-  rake
-  redcarpet
+  coveralls (~> 0.7)
+  minitest (~> 5.3)
+  rake (~> 10.3)
+  redcarpet (~> 3.1)
   xo!
-  yard
+  yard (~> 0.8)
