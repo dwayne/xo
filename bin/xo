@@ -218,7 +218,7 @@ def welcome
   puts "=" * heading.length
   puts
 
-  puts "NOTE: You can exit the game at anytime by pressing CTRL-C or CTRL-D."
+  puts "NOTE: You can exit the game at anytime by pressing CTRL-C."
   puts
 end
 
@@ -262,7 +262,27 @@ def get_option(options)
   end
 end
 
+def say_goodbye
+  puts "Thank you for playing."
+  puts "Bye!"
+end
+
+def terminate
+  puts
+  puts
+  say_goodbye
+  exit
+end
+
+def set_up_ctrl_c_handler
+  trap("INT") {
+    terminate
+  }
+end
+
 def main
+  set_up_ctrl_c_handler
+
   welcome
 
   level = ask_for_difficulty_level
@@ -288,8 +308,7 @@ def main
     game.start
   end
 
-  puts "Thank you for playing."
-  puts "Bye!"
+  say_goodbye
 end
 
 main
