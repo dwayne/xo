@@ -57,27 +57,27 @@ end
 
 class Human
 
-  def is_human?
-    true
+  def initialize(humans)
+    @humans = humans
   end
 
-  def get_move(grid, turn, humans)
+  def get_move(grid, turn)
     puts grid
     puts
 
     puts "Enter your move in the format r, c."
-    prompt_for_move(grid, turn, humans)
+    prompt_for_move(grid, turn)
   end
 
-  def handle_next_turn(grid, humans)
+  def handle_next_turn(grid)
     puts grid
     puts
   end
 
-  def handle_game_over(grid, event, humans)
+  def handle_game_over(grid, event)
     case event[:type]
     when :winner
-      puts "Congratulations! #{humans == 2 ? event[:last_move][:turn] : 'You'} won."
+      puts "Congratulations! #{@humans == 2 ? event[:last_move][:turn] : 'You'} won."
     when :squashed
       puts "Sorry! Game squashed."
     end
@@ -85,7 +85,7 @@ class Human
     puts
   end
 
-  def handle_invalid_move(event, humans)
+  def handle_invalid_move(event)
     puts "Sorry! You cannot make that move."
 
     case event[:type]
@@ -100,7 +100,7 @@ class Human
 
   private
 
-    def prompt_for_move(grid, turn, humans)
+    def prompt_for_move(grid, turn)
       print "> "
 
       position = gets.chomp.split(',').map(&:strip).map(&:to_i)
@@ -109,27 +109,24 @@ class Human
         puts
         position
       else
-        prompt_for_move(grid, turn, humans)
+        prompt_for_move(grid, turn)
       end
     end
 end
 
 class Computer
 
-  def initialize(ai)
+  def initialize(humans, ai)
+    @humans = humans
     @ai = ai
   end
 
-  def is_human?
-    false
-  end
-
-  def get_move(grid, turn, humans)
-    puts "Waiting for the computer to play..." if humans == 1
+  def get_move(grid, turn)
+    puts "Waiting for the computer to play..." if @humans == 1
 
     r, c = @ai.moves(grid, turn).shuffle[0]
 
-    if humans == 1
+    if @humans == 1
       puts "The computer played at #{r}, #{c}."
       puts
     end
@@ -137,18 +134,18 @@ class Computer
     [r, c]
   end
 
-  def handle_next_turn(grid, humans)
+  def handle_next_turn(grid)
   end
 
-  def handle_game_over(grid, event, humans)
-    if humans == 0
+  def handle_game_over(grid, event)
+    if @humans == 0
       case event[:type]
       when :winner
         puts "#{event[:last_move][:turn]} wins!"
       when :squashed
         puts "Game squashed!"
       end
-    elsif humans == 1
+    elsif @humans == 1
       puts grid
       puts
 
@@ -163,7 +160,7 @@ class Computer
     end
   end
 
-  def handle_invalid_move(event, humans)
+  def handle_invalid_move(event)
   end
 end
 
@@ -199,22 +196,18 @@ class Game
       turn = @engine.turn
       player = @players[turn]
 
-      r, c = player.get_move(@engine.grid, turn, humans)
+      r, c = player.get_move(@engine.grid, turn)
 
       event = @engine.play(r, c).last_event
 
       case event[:name]
       when :next_turn
-        player.handle_next_turn(@engine.grid, humans)
+        player.handle_next_turn(@engine.grid)
       when :game_over
-        player.handle_game_over(@engine.grid, event, humans)
+        player.handle_game_over(@engine.grid, event)
       when :invalid_move
-        player.handle_invalid_move(event, humans)
+        player.handle_invalid_move(event)
       end
-    end
-
-    def humans
-      @_humans ||= @players.values.map { |player| player.is_human? ? 1 : 0 }.inject(:+)
     end
 end
 
@@ -280,8 +273,8 @@ def main
   play_first = ask_to_play_first
 
   players = {}
-  players[human_token] = Human.new
-  players[computer_token] = Computer.new(level.new)
+  players[human_token] = Human.new(1)
+  players[computer_token] = Computer.new(1, level.new)
 
   game = Game.new(players)
   game.start(play_first ? human_token : computer_token)
