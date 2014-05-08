@@ -9,7 +9,7 @@ A [Ruby](http://www.ruby-lang.org/en/) library for [Tic-tac-toe](http://en.wikip
 
 The code is well documented and fully tested, so please have a [read of the documentation](http://rubydoc.info/github/dwayne/xo) and have a [look at the tests](https://github.com/dwayne/xo/tree/master/spec/xo).
 
-My implementation of the [Minimax algorithm](http://en.wikipedia.org/wiki/Minimax#Minimax_algorithm_with_alternate_moves) might be a little different than what you've seen before. It uses symmetry to significantly reduce the search space and in so doing we get good [performance out of the algorithm](#Performance_of_the_Minimax_Algorithm). However, I still want to get it under 1 second. I'd love to get your thoughts on how I can make it happen. Have a [look](https://github.com/dwayne/xo/blob/master/lib/xo/ai/minimax.rb#L23).
+My implementation of the [Minimax algorithm](http://en.wikipedia.org/wiki/Minimax#Minimax_algorithm_with_alternate_moves) might be a little different than what you've seen before. It uses symmetry to significantly reduce the search space and in so doing we get good [performance out of the algorithm](#performance-of-the-minimax-algorithm). However, I still want to get it under 1 second. I'd love to get your thoughts on how I can make it happen. Have a [look](https://github.com/dwayne/xo/blob/master/lib/xo/ai/minimax.rb#L23).
 
 ## Installation
 
@@ -23,7 +23,6 @@ Managing the grid yourself.
 
 ```ruby
 require 'xo'
-
 include XO
 
 g = Grid.new('xx oo')
@@ -34,10 +33,12 @@ puts g # =>  x | x |
        #    ---+---+---
        #       |   |
 
-Evaluator.analyze(g, Grid::X) # => { status: :ok }
+evaluator = Evaluator.instance
+
+evaluator.analyze(g, Grid::X) # => { status: :ok }
 
 g[1, 3] = Grid::X
-Evaluator.analyze(g, Grid::X) # => { status: :game_over,
+evaluator.analyze(g, Grid::X) # => { status: :game_over,
                               #      type: :winner,
                               #      details: [{
                               #        where: :row,
@@ -46,7 +47,7 @@ Evaluator.analyze(g, Grid::X) # => { status: :game_over,
                               #      }]
                               #    }
 
-Evaluator.analyze(g, Grid::O) # => { status: :game_over,
+evaluator.analyze(g, Grid::O) # => { status: :game_over,
                               #      type: :loser,
                               #      details: [{
                               #        where: :row,
@@ -60,9 +61,9 @@ The problem with managing the grid yourself is that there is nothing stopping yo
 
 ```ruby
 g = Grid.new('xx')
-Evaluator.analyze(g, Grid::O) # => { status: :invalid_grid,
-                              #      type: :too_many_moves_ahead
-                              #    }
+Evaluator.instance.analyze(g, Grid::O) # => { status: :invalid_grid,
+                                       #      type: :too_many_moves_ahead
+                                       #    }
 ```
 
 To avoid such situations, let the engine handle game play. Once you tell it who plays first, then it ensures that the game play follows the rules of [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
