@@ -62,21 +62,19 @@ class Human
   end
 
   def get_move(grid, turn, humans)
-    puts
     puts grid
     puts
 
+    puts "Enter your move in the format r, c."
     prompt_for_move(grid, turn, humans)
   end
 
   def handle_next_turn(grid, humans)
-    puts
     puts grid
+    puts
   end
 
   def handle_game_over(grid, event, humans)
-    puts
-
     case event[:type]
     when :winner
       puts "Congratulations! #{humans == 2 ? event[:last_move][:turn] : 'You'} won."
@@ -88,7 +86,6 @@ class Human
   end
 
   def handle_invalid_move(event, humans)
-    puts
     puts "Sorry! You cannot make that move."
 
     case event[:type]
@@ -97,6 +94,8 @@ class Human
     when :out_of_bounds
       puts "That position is not on the board."
     end
+
+    puts
   end
 
   private
@@ -107,6 +106,7 @@ class Human
       position = gets.chomp.split(',').map(&:strip).map(&:to_i)
 
       if position.length == 2
+        puts
         position
       else
         prompt_for_move(grid, turn, humans)
@@ -125,15 +125,13 @@ class Computer
   end
 
   def get_move(grid, turn, humans)
-    if humans == 1
-      puts
-      puts "Waiting for the computer to play..."
-    end
+    puts "Waiting for the computer to play..." if humans == 1
 
     r, c = @ai.moves(grid, turn).shuffle[0]
 
     if humans == 1
       puts "The computer played at #{r}, #{c}."
+      puts
     end
 
     [r, c]
@@ -227,7 +225,7 @@ def welcome
   puts "=" * heading.length
   puts
 
-  puts "NOTE: You can exit the game at anytime by pressing CTRL-C."
+  puts "NOTE: You can exit the game at anytime by pressing CTRL-C or CTRL-D."
   puts
 end
 
@@ -264,6 +262,7 @@ def get_option(options)
   selection = gets.chomp
 
   if options.key?(selection)
+    puts
     options[selection]
   else
     get_option(options)
