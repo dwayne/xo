@@ -8,8 +8,6 @@ include XO
 AUTHOR = "Dwayne Crooks"
 EMAIL  = "me@dwaynecrooks.com"
 
-PROMPT = "> "
-
 class Player
 
   def moves(grid, turn)
@@ -57,6 +55,171 @@ class Hard < Player
   end
 end
 
+class Human
+
+  def is_human?
+    true
+  end
+
+  def get_move(grid, turn, humans)
+    puts
+    puts grid
+    puts
+
+    prompt_for_move(grid, turn, humans)
+  end
+
+  def handle_next_turn(grid, humans)
+    puts
+    puts grid
+  end
+
+  def handle_game_over(grid, event, humans)
+    puts
+
+    case event[:type]
+    when :winner
+      puts "Congratulations! #{humans == 2 ? event[:last_move][:turn] : 'You'} won."
+    when :squashed
+      puts "Sorry! Game squashed."
+    end
+
+    puts
+  end
+
+  def handle_invalid_move(event, humans)
+    puts
+    puts "Sorry! You cannot make that move."
+
+    case event[:type]
+    when :occupied
+      puts "That position is occupied."
+    when :out_of_bounds
+      puts "That position is not on the board."
+    end
+  end
+
+  private
+
+    def prompt_for_move(grid, turn, humans)
+      print "> "
+
+      position = gets.chomp.split(',').map(&:strip).map(&:to_i)
+
+      if position.length == 2
+        position
+      else
+        prompt_for_move(grid, turn, humans)
+      end
+    end
+end
+
+class Computer
+
+  def initialize(ai)
+    @ai = ai
+  end
+
+  def is_human?
+    false
+  end
+
+  def get_move(grid, turn, humans)
+    if humans == 1
+      puts
+      puts "Waiting for the computer to play..."
+    end
+
+    r, c = @ai.moves(grid, turn).shuffle[0]
+
+    if humans == 1
+      puts "The computer played at #{r}, #{c}."
+    end
+
+    [r, c]
+  end
+
+  def handle_next_turn(grid, humans)
+  end
+
+  def handle_game_over(grid, event, humans)
+    if humans == 0
+      case event[:type]
+      when :winner
+        puts "#{event[:last_move][:turn]} wins!"
+      when :squashed
+        puts "Game squashed!"
+      end
+    elsif humans == 1
+      puts grid
+      puts
+
+      case event[:type]
+      when :winner
+        puts "Sorry! You lost."
+      when :squashed
+        puts "Sorry! Game squashed."
+      end
+
+      puts
+    end
+  end
+
+  def handle_invalid_move(event, humans)
+  end
+end
+
+class Game
+
+  def initialize(players)
+    @players = players
+    @engine = Engine.new
+  end
+
+  def start(turn = false)
+    if turn
+      @engine.start(turn)
+    else
+      event = @engine.last_event
+
+      case event[:type]
+      when :winner
+        @engine.continue_playing(@engine.turn)
+      when :squashed
+        @engine.continue_playing(@engine.next_turn)
+      end
+    end
+  end
+
+  def run
+    run_one_turn while @engine.state != :game_over
+  end
+
+  private
+
+    def run_one_turn
+      turn = @engine.turn
+      player = @players[turn]
+
+      r, c = player.get_move(@engine.grid, turn, humans)
+
+      event = @engine.play(r, c).last_event
+
+      case event[:name]
+      when :next_turn
+        player.handle_next_turn(@engine.grid, humans)
+      when :game_over
+        player.handle_game_over(@engine.grid, event, humans)
+      when :invalid_move
+        player.handle_invalid_move(event, humans)
+      end
+    end
+
+    def humans
+      @_humans ||= @players.values.map { |player| player.is_human? ? 1 : 0 }.inject(:+)
+    end
+end
+
 def welcome
   heading = "Welcome to xo! A Tic-tac-toe game client created by #{AUTHOR}."
 
@@ -65,16 +228,6 @@ def welcome
   puts
 
   puts "NOTE: You can exit the game at anytime by pressing CTRL-C."
-  puts
-end
-
-def display_prompt
-  print PROMPT
-end
-
-def display_start
-  puts
-  puts "Starting..."
   puts
 end
 
@@ -106,7 +259,7 @@ def ask_to_play_again
 end
 
 def get_option(options)
-  display_prompt
+  print '> '
 
   selection = gets.chomp
 
@@ -117,132 +270,34 @@ def get_option(options)
   end
 end
 
-def play(engine, ai)
-  puts engine.grid
-  puts
-  puts "Your move (enter in the format r, c):"
+def main
+  welcome
 
-  r, c = get_move
+  level = ask_for_difficulty_level
 
-  event = engine.play(r, c).last_event
+  human_token = ask_for_token
+  computer_token = Grid.other_token(human_token)
 
-  case event[:name]
-  when :next_turn
-    puts
-    puts engine.grid
-    puts
+  play_first = ask_to_play_first
 
-    ai_play(engine, ai)
-  when :game_over
-    puts
+  players = {}
+  players[human_token] = Human.new
+  players[computer_token] = Computer.new(level.new)
 
-    case event[:type]
-    when :winner
-      puts "Congratulations! You won."
-    when :squashed
-      puts "Sorry! Game squashed."
-    end
+  game = Game.new(players)
+  game.start(play_first ? human_token : computer_token)
 
-    puts
-  when :invalid_move
-    puts
-    puts "Sorry! You cannot make that move."
+  loop do
+    game.run
 
-    case event[:type]
-    when :occupied
-      puts "That position is occupied."
-      puts
-    when :out_of_bounds
-      puts "That position is not on the board."
-      puts
-    end
+    play_again = ask_to_play_again
+    break unless play_again
 
-    play(engine, ai)
-  end
-end
-
-def get_move
-  display_prompt
-
-  position = gets.chomp.split(',').map(&:strip).map(&:to_i)
-
-  if position.length == 2
-    position
-  else
-    get_move
-  end
-end
-
-def ai_play(engine, ai)
-  puts "Waiting for the computer to play..."
-
-  r, c = ai.moves(engine.grid, engine.turn).shuffle[0]
-
-  event = engine.play(r, c).last_event
-
-  puts "The computer played at #{r}, #{c}."
-  puts
-
-  case event[:name]
-  when :next_turn
-    play(engine, ai)
-  when :game_over
-    puts engine.grid
-    puts
-
-    case event[:type]
-    when :winner
-      puts "Sorry! You lost."
-    when :squashed
-      puts "Sorry! Game squashed."
-    end
-
-    puts
-  end
-end
-
-welcome
-
-level      = ask_for_difficulty_level
-player     = ask_for_token
-play_first = ask_to_play_first
-
-ai = level.new
-engine = Engine.new
-
-display_start
-
-if play_first
-  engine.start(player)
-  play(engine, ai)
-else
-  engine.start(Grid.other_token(player))
-end
-
-while engine.state != :game_over
-  player == engine.turn ? play(engine, ai) : ai_play(engine, ai)
-end
-
-play_again = ask_to_play_again
-
-while play_again
-  display_start
-
-  event = engine.last_event
-
-  case event[:type]
-  when :winner
-    engine.continue_playing(engine.turn)
-  when :squashed
-    engine.continue_playing(engine.next_turn)
+    game.start
   end
 
-  while engine.state != :game_over
-    player == engine.turn ? play(engine, ai) : ai_play(engine, ai)
-  end
-
-  play_again = ask_to_play_again
+  puts "Thank you for playing."
+  puts "Bye!"
 end
 
-puts "Thank you for playing."
-puts "Bye!"
+main
