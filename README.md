@@ -1,10 +1,21 @@
 # xo
 
-[![Gem Version](https://badge.fury.io/rb/xo.svg)](http://badge.fury.io/rb/xo) [![Build Status](https://travis-ci.org/dwayne/xo.svg?branch=master)](https://travis-ci.org/dwayne/xo) [![Coverage Status](https://coveralls.io/repos/dwayne/xo/badge.png)](https://coveralls.io/r/dwayne/xo) [![Code Climate](https://codeclimate.com/github/dwayne/xo.png)](https://codeclimate.com/github/dwayne/xo)
+[![Gem Version](https://badge.fury.io/rb/xo.svg)](http://badge.fury.io/rb/xo)
+[![Build Status](https://travis-ci.org/dwayne/xo.svg?branch=master)](https://travis-ci.org/dwayne/xo)
+[![Coverage Status](https://coveralls.io/repos/dwayne/xo/badge.png)](https://coveralls.io/r/dwayne/xo)
+[![Code Climate](https://codeclimate.com/github/dwayne/xo.png)](https://codeclimate.com/github/dwayne/xo)
 
 A [Ruby](http://www.ruby-lang.org/en/) library for [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
 
-The code is well documented and fully tested, so please have a [read of the documentation](http://rubydoc.info/github/dwayne/xo) and take a [look at the tests](https://github.com/dwayne/xo/tree/master/spec/xo). If you're interested to see my [sublime](https://www.google.tt/search?q=define%3A+sublime) (in my humble opinion :sunglasses:) implementation of the [Minimax algorithm](http://en.wikipedia.org/wiki/Minimax#Minimax_algorithm_with_alternate_moves) then view it [here](https://github.com/dwayne/xo/blob/master/lib/xo/ai/minimax.rb#L23). It uses the concept of a [geometric grid](https://github.com/dwayne/xo/blob/master/lib/xo/ai/geometric_grid.rb) to acheive its speed up.
+The code is well documented and fully tested, so please have a [read of the documentation](http://rubydoc.info/github/dwayne/xo) and have a [look at the tests](https://github.com/dwayne/xo/tree/master/spec/xo).
+
+My implementation of the [Minimax algorithm](http://en.wikipedia.org/wiki/Minimax#Minimax_algorithm_with_alternate_moves) might be a little different than what you've seen before. It uses symmetry to significantly reduce the search space and in so doing we get good [performance out of the algorithm](#Performance_of_the_Minimax_Algorithm). However, I still want to get it under 1 second. I'd love to get your thoughts on how I can make it happen. Have a [look](https://github.com/dwayne/xo/blob/master/lib/xo/ai/minimax.rb#L23).
+
+## Installation
+
+```
+$ gem install xo
+```
 
 ## Example usage
 
@@ -70,13 +81,15 @@ e.last_event # => { name: :game_over,
              #    }
 ```
 
-I quickly built a [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe) client that uses the engine and all the other abstractions in this library. See how everything comes together by viewing its implementation right [here](https://github.com/dwayne/xo/blob/master/bin/xo).
+I also built a [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe) command-line client that uses the library. See how everything comes together by viewing its implementation right [here](https://github.com/dwayne/xo/blob/master/bin/xo).
 
-**NOTE:** *I plan to rewrite the client code following the [SOLID principles](http://en.wikipedia.org/wiki/SOLID_(object-oriented_design)) so stay tuned for that.*
+To use the [client](https://github.com/dwayne/xo/blob/master/bin/xo) just type,
 
-**TODO:**
+```
+$ xo
+```
 
-- Release a new version, once I complete the rewrite of the client.
+on the command-line after installing the gem.
 
 ## Performance of the Minimax Algorithm
 
