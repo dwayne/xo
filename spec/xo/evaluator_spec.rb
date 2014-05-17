@@ -4,10 +4,10 @@ module XO
 
   describe Evaluator do
 
-    describe ".analyze" do
+    let (:evaluator) { Evaluator.instance }
+    let (:grid) { Grid.new }
 
-      let (:evaluator) { Evaluator.instance }
-      let (:grid) { Grid.new }
+    describe "#analyze" do
 
       describe "standard play" do
 
@@ -227,13 +227,6 @@ module XO
         end
       end
 
-      describe "invalid token input" do
-
-        it "raises ArgumentError" do
-          proc { evaluator.analyze(Grid.new, :not_a_token) }.must_raise ArgumentError
-        end
-      end
-
       describe "invalid grid input" do
 
         it "returns too many moves ahead" do
@@ -254,6 +247,13 @@ module XO
 
           evaluator.analyze(grid, Grid::X).must_equal result
           evaluator.analyze(grid, Grid::O).must_equal result
+        end
+      end
+
+      describe "invalid token input" do
+
+        it "raises ArgumentError" do
+          proc { evaluator.analyze(Grid.new, :not_a_token) }.must_raise ArgumentError
         end
       end
     end
