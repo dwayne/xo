@@ -74,8 +74,6 @@ module XO
 
     def clear
       grid.fill(EMPTY)
-
-      self
     end
 
     # Iterates over all the positions of this grid from left to right and top to bottom.

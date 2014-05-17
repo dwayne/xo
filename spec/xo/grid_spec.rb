@@ -212,10 +212,6 @@ module XO
 
         grid.empty?.must_equal true
       end
-
-      it "returns self" do
-        grid.clear.must_be_same_as grid
-      end
     end
 
     describe "#each" do
