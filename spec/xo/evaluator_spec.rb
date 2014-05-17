@@ -262,5 +262,15 @@ module XO
         end
       end
     end
+
+    describe ".xos" do
+
+      it "returns the number of x's and o's" do
+        xs, os = Evaluator.xos(Grid.new('xoxxo'))
+
+        xs.must_equal 3
+        os.must_equal 2
+      end
+    end
   end
 end
