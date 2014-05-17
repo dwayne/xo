@@ -12,103 +12,54 @@ module XO
   #    2    |   |
   #      ---+---+---
   #    3    |   |
-  #
-  # It is important to note that if a position stores anything other than
-  # {X} or {O} then that position is considered to be open.
   class Grid
 
     X = :x
     O = :o
+
+    EMPTY = :e
 
     ROWS = 3
     COLS = 3
 
     N = ROWS * COLS
 
-    # Determines whether or not position (r, c) is such that 1 <= r <= 3 and 1 <= c <= 3.
-    #
-    # @param r [Integer] the row
-    # @param c [Integer] the column
-    # @return [Boolean] true iff the position is contained within a 3x3 grid
     def self.contains?(r, c)
       r.between?(1, ROWS) && c.between?(1, COLS)
     end
 
-    # Classifies what is and isn't considered to be a token.
-    #
-    # @param val [Object]
-    # @return [Boolean] true iff val is {X} or {O}
-    def self.is_token?(val)
-      val == X || val == O
+    def self.is_token?(k)
+      k == X || k == O
     end
 
-    # Determines the other token.
-    #
-    # @param val [Object]
-    # @return [Object] {X} given {O}, {O} given {X} or the original value
-    def self.other_token(val)
-      val == X ? O : (val == O ? X : val)
+    def self.other_token(k)
+      k == X ? O : (k == O ? X : k)
     end
 
-    attr_reader :grid
-    private :grid
-
-    # Creates a new empty grid by default. You can also create a
-    # prepopulated grid by passing in a string representation.
-    #
-    # @example
-    #  g = Grid.new('xo ox   o')
     def initialize(g = '')
       @grid = from_string(g)
     end
 
-    # Creates a copy of the given grid. Use #dup to get your copy.
-    #
-    # @example
-    #  g = Grid.new
-    #  g_copy = g.dup
-    #
-    # @param orig [Grid] the original grid
-    # @return [Grid] a copy
     def initialize_copy(orig)
       @grid = orig.instance_variable_get(:@grid).dup
     end
 
-    # Determines whether or not there are any tokens on the grid.
-    #
-    # @return [Boolean] true iff there are no tokens on the grid
     def empty?
-      grid.all? { |val| !self.class.is_token?(val) }
+      grid.all? { |k| !self.class.is_token?(k) }
     end
 
-    # Determines whether or not every position on the grid has a token?
-    #
-    # @return [Boolean] true iff every position on the grid has a token
     def full?
-      grid.all? { |val| self.class.is_token?(val) }
+      grid.all? { |k| self.class.is_token?(k) }
     end
 
-    # Sets position (r, c) to the given value.
-    #
-    # @param r [Integer] the row
-    # @param c [Integer] the column
-    # @param val [Object]
-    # @raise [IndexError] if the position is off the grid
-    # @return [Object] the value it was given
-    def []=(r, c, val)
+    def []=(r, c, k)
       if self.class.contains?(r, c)
-        grid[idx(r, c)] = self.class.is_token?(val) ? val : :e
+        grid[idx(r, c)] = normalize(k)
       else
         raise IndexError, "position (#{r}, #{c}) is off the grid"
       end
     end
 
-    # Retrieves the value at the given position (r, c).
-    #
-    # @param r [Integer] the row
-    # @param c [Integer] the column
-    # @raise [IndexError] if the position is off the grid
-    # @return [Object]
     def [](r, c)
       if self.class.contains?(r, c)
         grid[idx(r, c)]
@@ -117,29 +68,22 @@ module XO
       end
     end
 
-    # Determines whether or not position (r, c) contains a token.
-    #
-    # @param r [Integer] the row
-    # @param c [Integer] the column
-    # @raise [IndexError] if the position is off the grid
-    # @return true iff the position does not contain a token
     def open?(r, c)
       !self.class.is_token?(self[r, c])
     end
 
-    # Removes all tokens from the grid.
     def clear
-      grid.fill(:e)
+      grid.fill(EMPTY)
 
       self
     end
 
-    # Used for iterating over all the positions of the grid from left to right and top to bottom.
+    # Iterates over all the positions of this grid from left to right and top to bottom.
     #
     # @example
     #  g = Grid.new
-    #  g.each do |r, c, val|
-    #    puts "(#{r}, #{c}) -> #{val}"
+    #  g.each do |r, c, k|
+    #    puts "(#{r}, #{c}) -> #{k}"
     #  end
     def each
       (1..ROWS).each do |r|
@@ -149,7 +93,7 @@ module XO
       end
     end
 
-    # Used for iterating over all the open positions of the grid from left to right and top to bottom.
+    # Iterates over all the open positions of this grid from left to right and top to bottom.
     #
     # @example
     #  g = Grid.new
@@ -164,16 +108,14 @@ module XO
       self.each { |r, c, _| yield(r, c) if open?(r, c) }
     end
 
-    # Returns a string representation of the grid which may be useful
-    # for debugging.
+    # Returns a string representation of this grid which can be useful for debugging.
     def inspect
-      grid.map { |val| t(val) }.join
+      grid.map { |k| t(k) }.join
     end
 
-    # Returns a string representation of the grid which may be useful
-    # for display.
+    # Returns a string representation of this grid which can be useful for display.
     def to_s
-      g = grid.map { |val| t(val) }
+      g = grid.map { |k| t(k) }
 
       [" #{g[0]} | #{g[1]} | #{g[2]} ",
        "---+---+---",
@@ -184,21 +126,23 @@ module XO
 
     private
 
-      def from_string(g)
-        g = g.to_s
-        l = g.length
+      attr_reader :grid
 
-        g = if l < N
-          g + ' ' * (N - l)
-        elsif l > N
-          g[0..N-1]
-        else
-          g
+      def from_string(s)
+        adjust_length(s, N).split('').map do |ch|
+          normalize(ch.to_sym)
         end
+      end
 
-        g.split('').map do |ch|
-          sym = ch.to_sym
-          sym == X || sym == O ? sym : :e
+      def adjust_length(s, n)
+        l = s.length
+
+        if l < n
+          s + ' ' * (n - l)
+        elsif l > n
+          s[0..n-1]
+        else
+          s
         end
       end
 
@@ -217,8 +161,14 @@ module XO
         COLS * (r - 1) + (c - 1)
       end
 
-      def t(val)
-        self.class.is_token?(val) ? val : ' '
+      NORMALIZED_TO_STRING_MAP = { X => 'x', O => 'o', EMPTY => ' ' }
+
+      def t(k)
+        NORMALIZED_TO_STRING_MAP[normalize(k)]
+      end
+
+      def normalize(k)
+        self.class.is_token?(k) ? k : EMPTY
       end
   end
 end

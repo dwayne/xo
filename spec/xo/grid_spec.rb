@@ -4,12 +4,18 @@ module XO
 
   describe Grid do
 
+    let(:grid) { Grid.new }
+
     it "defines X" do
       Grid::X.must_equal :x
     end
 
     it "defines O" do
       Grid::O.must_equal :o
+    end
+
+    it "defines EMPTY" do
+      Grid::EMPTY.must_equal :e
     end
 
     it "has 3 rows" do
@@ -56,8 +62,8 @@ module XO
       end
 
       it "returns false otherwise" do
-        [nil, :e, '', ' '].each do
-          Grid.is_token?(:e).must_equal false
+        [nil, :e, '', ' '].each do |val|
+          Grid.is_token?(val).must_equal false
         end
       end
     end
@@ -77,16 +83,11 @@ module XO
       end
     end
 
-    let(:grid) { Grid.new }
+    describe ".new" do
 
-    describe "an initial grid" do
-
-      it "is empty" do
+      it "is returns an empty grid when given no arguments" do
         grid.empty?.must_equal true
       end
-    end
-
-    describe "#new" do
 
       it "can create a grid from a string" do
         grid = Grid.new('xox o')
@@ -154,14 +155,14 @@ module XO
       end
 
       it "returns false when at least one position doesn't have a token" do
-        grid[1, 3] = :e
+        grid[1, 3] = Grid::EMPTY
         grid.full?.must_equal false
       end
     end
 
     describe "#[]=" do
 
-      it "sets a position to X, O or :e" do
+      it "sets a position to X, O or EMPTY" do
         grid[2, 1] = Grid::X
         grid[2, 1].must_equal Grid::X
 
@@ -169,7 +170,7 @@ module XO
         grid[2, 2].must_equal Grid::O
 
         grid[2, 3] = :anything_else
-        grid[2, 3].must_equal :e
+        grid[2, 3].must_equal Grid::EMPTY
       end
 
       it "raises IndexError when the position is off the grid" do
