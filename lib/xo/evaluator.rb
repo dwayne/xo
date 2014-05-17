@@ -1,5 +1,3 @@
-require 'singleton'
-
 require 'xo/grid'
 
 module XO
@@ -11,7 +9,6 @@ module XO
   # 3. Who is the winner/loser?
   # 4. Which positions make up the winning row, column and/or diagonal?
   class Evaluator
-    include Singleton
 
     # Examines the given grid assuming that the given token is the one that was last placed on it.
     #
