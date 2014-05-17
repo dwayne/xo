@@ -212,7 +212,7 @@ module XO
         @grid[r, c] = turn
         last_move = { turn: turn, r: r, c: c }
 
-        result = Evaluator.instance.analyze(@grid, turn)
+        result = evaluator.analyze(@grid, turn)
 
         case result[:status]
         when :ok
@@ -236,6 +236,10 @@ module XO
         @grid.clear
 
         set_event(:game_started, type: :continue_playing)
+      end
+
+      def evaluator
+        @_evaluator ||= Evaluator.new
       end
 
       def check_turn(turn)

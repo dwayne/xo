@@ -114,7 +114,7 @@ module XO
         end
 
         def analyze_grid(player)
-          @results = Evaluator.instance.analyze(the_grid, player.token)
+          @results = Evaluator.new.analyze(the_grid, player.token)
         end
 
         def terminal?
@@ -135,7 +135,7 @@ module XO
         # patch things up so that we can find a representative in our search space
         # for the given configuration.
         def lift(grid, turn)
-          xs, os = Evaluator.instance.xos(grid)
+          xs, os = Evaluator.xos(grid)
 
           if turn == GeometricGrid::X
             if xs == os
