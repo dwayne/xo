@@ -210,6 +210,11 @@ module XO
                 positions: [[1, 3], [2, 2], [3, 1]]
               }]
             }
+
+            evaluator.analyze(grid, Grid::X).must_equal result
+
+            result[:type] = :loser
+            evaluator.analyze(grid, Grid::O).must_equal result
           end
         end
 
