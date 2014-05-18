@@ -239,7 +239,7 @@ module XO
       end
 
       def evaluator
-        @_evaluator ||= Evaluator.new
+        Evaluator.instance
       end
 
       def check_turn(turn)

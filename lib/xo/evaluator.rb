@@ -1,14 +1,17 @@
+require 'singleton'
+
 require 'xo/grid'
 
 module XO
 
-  # {Evaluator} defines an {#analyze} method than can be used to examine a grid to answer the following questions:
+  # {Evaluator} is a {http://en.wikipedia.org/wiki/Singleton_pattern Singleton} that defines an {#analyze} method than can be used to examine a grid to answer the following questions:
   #
   # 1. Is it a valid grid? A grid is considered valid if it possible for two players, taking turns, to reach the given grid configuration.
   # 2. Is there a winner/loser or is the grid squashed?
   # 3. Who is the winner/loser?
   # 4. Which positions make up the winning row, column and/or diagonal?
   class Evaluator
+    include Singleton
 
     # Examines the given grid assuming that the given token is the one that was last placed on it.
     #

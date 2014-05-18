@@ -87,7 +87,7 @@ module XO
         end
 
         def analyze_grid(player)
-          @result = Evaluator.new.analyze(master_grid, player.token)
+          @result = Evaluator.instance.analyze(master_grid, player.token)
         end
 
         def terminal?

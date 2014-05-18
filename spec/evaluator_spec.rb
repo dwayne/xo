@@ -4,7 +4,7 @@ module XO
 
   describe Evaluator do
 
-    let (:evaluator) { Evaluator.new }
+    let (:evaluator) { Evaluator.instance }
     let (:grid) { Grid.new }
 
     describe "#analyze" do
