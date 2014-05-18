@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.author        = 'Dwayne R. Crooks'
   spec.email         = ['me@dwaynecrooks.com']
   spec.summary       = %q{A Ruby library for Tic-tac-toe.}
-  spec.description   = %q{A Ruby library that can be used to develop Tic-tac-toe game clients.}
+  spec.description   = %q{A Ruby library for Tic-tac-toe that can be used to develop Tic-tac-toe game clients and servers.}
   spec.homepage      = 'https://github.com/dwayne/xo'
   spec.license       = 'MIT'
 
