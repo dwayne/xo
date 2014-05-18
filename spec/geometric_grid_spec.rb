@@ -4,8 +4,6 @@ module XO::AI
 
   describe GeometricGrid do
 
-    let(:grid) { GeometricGrid.new }
-
     describe "#rotate" do
 
       let (:grid) { GeometricGrid.new("xoooxxoxo") }
@@ -81,7 +79,7 @@ module XO::AI
       end
     end
 
-    describe "equality" do
+    describe "#==" do
 
       it "is reflexive, symmetric and transitive" do
         a = GeometricGrid.new('x')
