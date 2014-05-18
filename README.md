@@ -61,9 +61,9 @@ The problem with managing the grid yourself is that there is nothing stopping yo
 
 ```ruby
 g = Grid.new('xx')
-Evaluator.instance.analyze(g, Grid::O) # => { status: :invalid_grid,
-                                       #      type: :too_many_moves_ahead
-                                       #    }
+evaluator.analyze(g, Grid::O) # => { status: :invalid_grid,
+                              #      type: :too_many_moves_ahead
+                              #    }
 ```
 
 To avoid such situations, let the engine handle game play. Once you tell it who plays first, then it ensures that the game play follows the rules of [Tic-tac-toe](http://en.wikipedia.org/wiki/Tic-tac-toe).
