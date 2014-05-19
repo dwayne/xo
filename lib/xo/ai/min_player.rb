@@ -6,8 +6,8 @@ module XO
 
     class MinPlayer < Player
 
-      def non_terminal_score(next_grids, scores)
-        next_grids_scores(next_grids, scores).min
+      def best_score(next_grids_scores)
+        next_grids_scores.min
       end
 
       def winner_value

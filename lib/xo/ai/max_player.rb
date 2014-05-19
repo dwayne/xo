@@ -6,8 +6,8 @@ module XO
 
     class MaxPlayer < Player
 
-      def non_terminal_score(next_grids, scores)
-        next_grids_scores(next_grids, scores).max
+      def best_score(next_grids_scores)
+        next_grids_scores.max
       end
 
       def winner_value

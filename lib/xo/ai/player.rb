@@ -15,6 +15,10 @@ module XO
       end
 
       def non_terminal_score(next_grids, scores)
+        best_score(compute_next_grids_scores(next_grids, scores))
+      end
+
+      def best_score(next_grids_scores)
         raise NotImplementedError
       end
 
@@ -32,7 +36,7 @@ module XO
 
       private
 
-        def next_grids_scores(next_grids, scores)
+        def compute_next_grids_scores(next_grids, scores)
           next_grids.map { |grid| scores[grid] }
         end
     end
