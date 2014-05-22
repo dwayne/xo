@@ -98,10 +98,7 @@ module XO
 
           describe "when the move is on an occupied position" do
 
-            before do
-              engine.play(1, 1)
-              engine.play(1, 1)
-            end
+            before { engine.play(1, 1).play(1, 1) }
 
             it "remains in the Playing state" do
               engine.current_state.must_equal Playing
@@ -118,11 +115,7 @@ module XO
           describe "when the move results in a win" do
 
             before do
-              engine.play(1, 1)
-              engine.play(2, 1)
-              engine.play(1, 2)
-              engine.play(2, 2)
-              engine.play(1, 3)
+              engine.play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
             end
 
             it "transitions to the GameOver state" do
@@ -143,15 +136,12 @@ module XO
           describe "when the move results in a squashed game" do
 
             before do
-              engine.play(1, 1)
-              engine.play(2, 2)
-              engine.play(3, 3)
-              engine.play(1, 2)
-              engine.play(3, 2)
-              engine.play(3, 1)
-              engine.play(1, 3)
-              engine.play(2, 3)
-              engine.play(2, 1)
+              engine
+                .play(1, 1).play(2, 2)
+                .play(3, 3).play(1, 2)
+                .play(3, 2).play(3, 1)
+                .play(1, 3).play(2, 3)
+                .play(2, 1)
             end
 
             it "transitions to the GameOver state" do
@@ -190,11 +180,7 @@ module XO
 
         describe "#stop" do
 
-          before do
-            engine.play(2, 2)
-            engine.play(3, 1)
-            engine.stop
-          end
+          before { engine.play(2, 2).play(3, 1).stop }
 
           it "resets the game" do
             engine.turn.must_equal :nobody
@@ -219,13 +205,9 @@ module XO
       describe "in the GameOver state" do
 
         before do
-          engine.start(Grid::X)
-
-          engine.play(1, 1)
-          engine.play(2, 1)
-          engine.play(1, 2)
-          engine.play(2, 2)
-          engine.play(1, 3)
+          engine
+            .start(Grid::X)
+            .play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
         end
 
         it "is in the GameOver state" do
