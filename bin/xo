@@ -168,46 +168,41 @@ class Game
 
   def initialize(players)
     @players = players
+
     @engine = Engine.new
+    @engine.add_observer(self)
   end
 
   def start(turn = false)
-    if turn
-      @engine.start(turn)
-    else
-      event = @engine.last_event
-
-      case event[:type]
-      when :winner
-        @engine.continue_playing(@engine.turn)
-      when :squashed
-        @engine.continue_playing(@engine.next_turn)
-      end
-    end
+    turn ? engine.start(turn) : engine.continue_playing
   end
 
   def run
-    run_one_turn while @engine.state != :game_over
+    run_one_turn until engine.current_state == GameOver
+  end
+
+  def update(event)
+    player = players[engine.turn]
+
+    case event[:name]
+    when :next_turn
+      player.handle_next_turn(engine.grid)
+    when :game_over
+      player.handle_game_over(engine.grid, event)
+    when :invalid_move
+      player.handle_invalid_move(event)
+    end
   end
 
   private
 
+    attr_reader :players, :engine
+
     def run_one_turn
-      turn = @engine.turn
-      player = @players[turn]
+      turn = engine.turn
+      r, c = players[turn].get_move(engine.grid, turn)
 
-      r, c = player.get_move(@engine.grid, turn)
-
-      event = @engine.play(r, c).last_event
-
-      case event[:name]
-      when :next_turn
-        player.handle_next_turn(@engine.grid)
-      when :game_over
-        player.handle_game_over(@engine.grid, event)
-      when :invalid_move
-        player.handle_invalid_move(event)
-      end
+      engine.play(r, c)
     end
 end
 
