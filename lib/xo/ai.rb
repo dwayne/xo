@@ -1,5 +1,0 @@
-require 'xo/ai/geometric_grid'
-require 'xo/ai/player'
-require 'xo/ai/max_player'
-require 'xo/ai/min_player'
-require 'xo/ai/minimax'
