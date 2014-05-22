@@ -17,16 +17,17 @@ module XO
 
     # Starts another new game.
     #
+    # The token that won plays first, otherwise the game was squashed and so
+    # the next token plays first.
+    #
     # The engine is transitioned into the {Playing} state and the event
     #
     #   { name: :game_started, type: :continue_playing }
     #
     # is triggered.
-    #
-    # @param turn [Grid::X, Grid::O] specifies which token has first play
-    # @raise [ArgumentError] unless turn is either {Grid::X} or {Grid::O}
-    def continue_playing(turn)
-      start_game(turn, type: :continue_playing)
+    def continue_playing
+      game_context.set_turn_and_clear_grid(game_context.turn)
+      engine.transition_to_state_and_send_event(Playing, :game_started, type: :continue_playing)
     end
   end
 end

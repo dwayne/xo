@@ -38,7 +38,7 @@ module XO
     # - If the move results in a *squashed* game, then the event below is
     #   triggered and the engine is transitioned into the {GameOver} state.
     #
-    #     { name: :game_over, type: :squashed, last_move: { turn: :token, r: :row, c: :column } }
+    #     { name: :game_over, type: :squashed, last_move: { turn: :next_token, r: :row, c: :column } }
     #
     # - Otherwise, the event below is triggered and the engine remains in this
     #   state.
@@ -48,6 +48,7 @@ module XO
     # *Legend:*
     #
     # - *:token* is one of {Grid::X} or {Grid::O}
+    # - *:next_token* is one of {Grid::X} or {Grid::O}
     # - *:row* is one of 1, 2 or 3
     # - *:column* is one of 1, 2 or 3
     # - *:details* is taken verbatim from the :details key of the returned hash of {Evaluator#analyze}
@@ -75,6 +76,7 @@ module XO
             :game_over, type: :winner, last_move: last_move, details: result[:details]
           )
         when :squashed
+          game_context.switch_turns
           engine.transition_to_state_and_send_event(
             GameOver,
             :game_over, type: :squashed, last_move: last_move

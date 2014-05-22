@@ -204,43 +204,92 @@ module XO
 
       describe "in the GameOver state" do
 
-        before do
-          engine
-            .start(Grid::X)
-            .play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
+        describe "due to a win" do
+
+          before do
+            engine
+              .start(Grid::X)
+              .play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
+          end
+
+          it "is in the GameOver state" do
+            engine.current_state.must_equal GameOver
+          end
+
+          describe "#continue_playing" do
+
+            before { engine.continue_playing }
+
+            it "is X's turn" do
+              engine.turn.must_equal Grid::X
+            end
+
+            it "has an empty grid" do
+              engine.grid.must_be :empty?
+            end
+
+            it "transitions to the Playing state" do
+              engine.current_state.must_equal Playing
+            end
+
+            it "triggers an event" do
+              last_event = engine_observer.last_event
+
+              last_event[:name].must_equal :game_started
+              last_event[:type].must_equal :continue_playing
+            end
+          end
         end
 
-        it "is in the GameOver state" do
-          engine.current_state.must_equal GameOver
-        end
+        describe "due to a squashed game" do
 
-        describe "#continue_playing" do
-
-          before { engine.continue_playing(Grid::X) }
-
-          it "is X's turn" do
-            engine.turn.must_equal Grid::X
+          before do
+            engine
+              .start(Grid::X)
+              .play(1, 1).play(2, 2)
+              .play(3, 3).play(1, 2)
+              .play(3, 2).play(3, 1)
+              .play(1, 3).play(2, 3)
+              .play(2, 1)
           end
 
-          it "has an empty grid" do
-            engine.grid.must_be :empty?
+          it "is in the GameOver state" do
+            engine.current_state.must_equal GameOver
           end
 
-          it "transitions to the Playing state" do
-            engine.current_state.must_equal Playing
-          end
+          describe "#continue_playing" do
 
-          it "triggers an event" do
-            last_event = engine_observer.last_event
+            before { engine.continue_playing }
 
-            last_event[:name].must_equal :game_started
-            last_event[:type].must_equal :continue_playing
+            it "is O's turn" do
+              engine.turn.must_equal Grid::O
+            end
+
+            it "has an empty grid" do
+              engine.grid.must_be :empty?
+            end
+
+            it "transitions to the Playing state" do
+              engine.current_state.must_equal Playing
+            end
+
+            it "triggers an event" do
+              last_event = engine_observer.last_event
+
+              last_event[:name].must_equal :game_started
+              last_event[:type].must_equal :continue_playing
+            end
           end
         end
 
         describe "#stop" do
 
-          before { engine.stop }
+          before do
+            engine
+              .start(Grid::X)
+              .play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
+              .stop
+          end
 
           it "resets the game" do
             engine.turn.must_equal :nobody
@@ -256,9 +305,17 @@ module XO
           end
         end
 
-        it "raises StateDesignPattern::IllegalStateException for the actions start and play" do
-          proc { engine.start(Grid::X) }.must_raise StateDesignPattern::IllegalStateException
-          proc { engine.play(1, 1) }.must_raise StateDesignPattern::IllegalStateException
+        describe "what happens when calling illegal actions" do
+          before do
+            engine
+              .start(Grid::X)
+              .play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
+          end
+
+          it "raises StateDesignPattern::IllegalStateException for the actions start and play" do
+            proc { engine.start(Grid::X) }.must_raise StateDesignPattern::IllegalStateException
+            proc { engine.play(1, 1) }.must_raise StateDesignPattern::IllegalStateException
+          end
         end
       end
     end
