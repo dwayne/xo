@@ -1,286 +1,258 @@
 require 'spec_helper'
 
+class EngineObserver
+
+  def initialize
+    @events = []
+  end
+
+  def last_event
+    @events.last
+  end
+
+  def update(event)
+    @events << event
+  end
+end
+
 module XO
 
   describe Engine do
 
     let (:engine) { Engine.new }
+    let (:engine_observer) { EngineObserver.new }
 
-    describe "its initial state" do
+    describe "how the engine works" do
 
-      it "is in the :init state" do
-        engine.state.must_equal :init
-      end
+      before { engine.add_observer(engine_observer) }
 
-      it "is nobody's turn" do
-        engine.turn.must_equal :nobody
-      end
+      describe "in the Init state" do
 
-      it "has an empty grid" do
-        engine.grid.empty?.must_equal true
-      end
-
-      it "has last event set to :new" do
-        event = engine.last_event
-
-        event[:name].must_equal :new
-      end
-
-      describe "#next_turn" do
-
-        it "returns :nobody" do
-          engine.next_turn.must_equal :nobody
-        end
-      end
-    end
-
-    describe "#grid" do
-
-      it "returns a copy of the underlying grid" do
-        grid = engine.grid
-
-        grid[1, 1] = Grid::X
-
-        engine.grid.open?(1, 1).must_equal true
-      end
-    end
-
-    describe "how the state machine works" do
-
-      describe "state :init" do
-
-        it "is in state :init" do
-          engine.state.must_equal :init
+        it "is in the Init state" do
+          engine.current_state.must_equal Init
         end
 
         describe "#start" do
 
-          before { engine.start(Grid::X) }
+          describe "for valid input" do
 
-          it "changes state to :playing" do
-            engine.state.must_equal :playing
+            before { engine.start(Grid::X) }
+
+            it "is X's turn" do
+              engine.turn.must_equal Grid::X
+            end
+
+            it "has an empty grid" do
+              engine.grid.must_be :empty?
+            end
+
+            it "transitions to the Playing state" do
+              engine.current_state.must_equal Playing
+            end
+
+            it "triggers an event" do
+              engine_observer.last_event[:name].must_equal :game_started
+            end
           end
 
-          it "sets turn to the value passed in" do
-            engine.turn.must_equal Grid::X
-          end
+          describe "for invalid input" do
 
-          it "starts with an empty grid" do
-            engine.grid.empty?.must_equal true
-          end
-
-          it "sets last event" do
-            event = engine.last_event
-
-            event[:name].must_equal :game_started
-          end
-
-          describe "#next_turn" do
-
-            it "returns O" do
-              engine.next_turn.must_equal Grid::O
+            it "raises ArgumentError" do
+              proc { engine.start(:nobody) }.must_raise ArgumentError
             end
           end
         end
 
-        it "only allows #start to be called" do
-          proc { engine.stop }.must_raise Engine::IllegalStateError
-          proc { engine.play(1, 1) }.must_raise Engine::IllegalStateError
-          proc { engine.continue_playing(Grid::X) }.must_raise Engine::IllegalStateError
+        it "raises StateDesignPattern::IllegalStateException for the actions stop, play and continue_playing" do
+          proc { engine.stop }.must_raise StateDesignPattern::IllegalStateException
+          proc { engine.play(1, 1) }.must_raise StateDesignPattern::IllegalStateException
+          proc { engine.continue_playing(Grid::X) }.must_raise StateDesignPattern::IllegalStateException
         end
       end
 
-      describe "state :playing" do
+      describe "in the Playing state" do
 
-        before do
-          engine.start(Grid::X)
-        end
+        before { engine.start(Grid::O) }
 
-        it "is in state :playing" do
-          engine.state.must_equal :playing
+        it "is in the Playing state" do
+          engine.current_state.must_equal Playing
         end
 
         describe "#play" do
 
-          describe "valid moves" do
+          describe "when the move is out of bounds" do
 
-            describe "when given (1, 1)" do
+            before { engine.play(1, 0) }
 
-              before { engine.play(1, 1) }
-
-              it "remains in state :playing" do
-                engine.state.must_equal :playing
-              end
-
-              it "sets turn to O" do
-                engine.turn.must_equal Grid::O
-              end
-
-              it "updates the grid at that position" do
-                engine.grid[1, 1].must_equal Grid::X
-              end
-
-              it "sets last event" do
-                event = engine.last_event
-
-                event[:name].must_equal :next_turn
-                event[:last_move][:turn].must_equal Grid::X
-                event[:last_move][:r].must_equal 1
-                event[:last_move][:c].must_equal 1
-              end
+            it "remains in the Playing state" do
+              engine.current_state.must_equal Playing
             end
 
-            describe "when the next move results in the game being over" do
+            it "triggers an event" do
+              last_event = engine_observer.last_event
 
-              describe "winning" do
-
-                before do
-                  engine.play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
-                end
-
-                it "changes state to :game_over" do
-                  engine.state.must_equal :game_over
-                end
-
-                it "sets turn to the winner" do
-                  engine.turn.must_equal Grid::X
-                end
-
-                it "leaves the grid unchanged" do
-                  engine.grid.inspect.must_equal 'xxxoo    '
-                end
-
-                it "sets last event" do
-                  event = engine.last_event
-
-                  event[:name].must_equal :game_over
-                  event[:type].must_equal :winner
-                  event[:last_move][:turn].must_equal Grid::X
-                  event[:last_move][:r].must_equal 1
-                  event[:last_move][:c].must_equal 3
-                  event[:details].must_equal [
-                    { where: :row, index: 1, positions: [[1, 1], [1, 2], [1, 3]] }
-                  ]
-                end
-              end
-
-              describe "squashed" do
-
-                before do
-                  engine.play(1, 1).play(1, 2).play(1, 3).play(2, 2).play(3, 2).play(2, 1).play(2, 3).play(3, 3).play(3, 1)
-                end
-
-                it "changes state to :game_over" do
-                  engine.state.must_equal :game_over
-                end
-
-                it "leaves turn set to the last one played" do
-                  engine.turn.must_equal Grid::X
-                end
-
-                it "leaves the grid unchanged" do
-                  engine.grid.inspect.must_equal 'xoxooxxxo'
-                end
-
-                it "sets last event" do
-                  event = engine.last_event
-
-                  event[:name].must_equal :game_over
-                  event[:type].must_equal :squashed
-                  event[:last_move][:turn].must_equal Grid::X
-                  event[:last_move][:r].must_equal 3
-                  event[:last_move][:c].must_equal 1
-                end
-              end
+              last_event[:name].must_equal :invalid_move
+              last_event[:type].must_equal :out_of_bounds
             end
           end
 
-          describe "invalid moves" do
+          describe "when the move is on an occupied position" do
 
-            describe "when given (0, 0)" do
-
-              it "sets last event to out of bounds" do
-                event = engine.play(0, 0).last_event
-
-                event[:name].must_equal :invalid_move
-                event[:type].must_equal :out_of_bounds
-              end
+            before do
+              engine.play(1, 1)
+              engine.play(1, 1)
             end
 
-            describe "when given (1, 1) and it already has a token there" do
+            it "remains in the Playing state" do
+              engine.current_state.must_equal Playing
+            end
 
-              it "sets last event to occupied" do
-                event = engine.play(1, 1).play(1, 1).last_event
+            it "triggers an event" do
+              last_event = engine_observer.last_event
 
-                event[:name].must_equal :invalid_move
-                event[:type].must_equal :occupied
-              end
+              last_event[:name].must_equal :invalid_move
+              last_event[:type].must_equal :occupied
+            end
+          end
+
+          describe "when the move results in a win" do
+
+            before do
+              engine.play(1, 1)
+              engine.play(2, 1)
+              engine.play(1, 2)
+              engine.play(2, 2)
+              engine.play(1, 3)
+            end
+
+            it "transitions to the GameOver state" do
+              engine.current_state.must_equal GameOver
+            end
+
+            it "triggers an event" do
+              last_event = engine_observer.last_event
+
+              last_event[:name].must_equal :game_over
+              last_event[:type].must_equal :winner
+              last_event[:last_move].must_equal({ turn: Grid::O, r: 1, c: 3 })
+              last_event[:details][0][:where].must_equal :row
+              last_event[:details][0][:index].must_equal 1
+            end
+          end
+
+          describe "when the move results in a squashed game" do
+
+            before do
+              engine.play(1, 1)
+              engine.play(2, 2)
+              engine.play(3, 3)
+              engine.play(1, 2)
+              engine.play(3, 2)
+              engine.play(3, 1)
+              engine.play(1, 3)
+              engine.play(2, 3)
+              engine.play(2, 1)
+            end
+
+            it "transitions to the GameOver state" do
+              engine.current_state.must_equal GameOver
+            end
+
+            it "triggers an event" do
+              last_event = engine_observer.last_event
+
+              last_event[:name].must_equal :game_over
+              last_event[:type].must_equal :squashed
+              last_event[:last_move].must_equal({ turn: Grid::O, r: 2, c: 1 })
+            end
+          end
+
+          describe "when the move just advances the game" do
+
+            before { engine.play(1, 1) }
+
+            it "sets O at position (1, 1)" do
+              engine.grid[1, 1].must_equal Grid::O
+            end
+
+            it "remains in the Playing state" do
+              engine.current_state.must_equal Playing
+            end
+
+            it "triggers an event" do
+              last_event = engine_observer.last_event
+
+              last_event[:name].must_equal :next_turn
+              last_event[:last_move].must_equal({ turn: Grid::O, r: 1, c: 1 })
             end
           end
         end
 
         describe "#stop" do
 
-          before { engine.stop }
-
-          it "changes state to :init" do
-            engine.state.must_equal :init
+          before do
+            engine.play(2, 2)
+            engine.play(3, 1)
+            engine.stop
           end
 
-          it "sets turn to :nobody" do
+          it "resets the game" do
             engine.turn.must_equal :nobody
+            engine.grid.must_be :empty?
           end
 
-          it "clears the grid" do
-            engine.grid.empty?.must_equal true
+          it "transitions to the Init state" do
+            engine.current_state.must_equal Init
           end
 
-          it "sets last event" do
-            event = engine.last_event
-
-            event[:name].must_equal :game_stopped
+          it "triggers an event" do
+            engine_observer.last_event[:name].must_equal :game_stopped
           end
         end
 
-        it "only allows #play and #stop to be called" do
-          proc { engine.start(Grid::O) }.must_raise Engine::IllegalStateError
-          proc { engine.continue_playing(Grid::O) }.must_raise Engine::IllegalStateError
+        it "raises StateDesignPattern::IllegalStateException for the actions start and continue_playing" do
+          proc { engine.start(Grid::X) }.must_raise StateDesignPattern::IllegalStateException
+          proc { engine.continue_playing(Grid::X) }.must_raise StateDesignPattern::IllegalStateException
         end
       end
 
-      describe "state :game_over" do
+      describe "in the GameOver state" do
 
         before do
-          engine
-            .start(Grid::O)
-            .play(1, 1).play(2, 1).play(1, 2).play(2, 2).play(1, 3)
+          engine.start(Grid::X)
+
+          engine.play(1, 1)
+          engine.play(2, 1)
+          engine.play(1, 2)
+          engine.play(2, 2)
+          engine.play(1, 3)
         end
 
-        it "is in state :game_over" do
-          engine.state.must_equal :game_over
+        it "is in the GameOver state" do
+          engine.current_state.must_equal GameOver
         end
 
         describe "#continue_playing" do
 
-          before { engine.continue_playing(Grid::O) }
+          before { engine.continue_playing(Grid::X) }
 
-          it "changes state to :playing" do
-            engine.state.must_equal :playing
+          it "is X's turn" do
+            engine.turn.must_equal Grid::X
           end
 
-          it "sets turn to O" do
-            engine.turn.must_equal Grid::O
+          it "has an empty grid" do
+            engine.grid.must_be :empty?
           end
 
-          it "clears the grid" do
-            engine.grid.empty?.must_equal true
+          it "transitions to the Playing state" do
+            engine.current_state.must_equal Playing
           end
 
-          it "sets last event" do
-            event = engine.last_event
+          it "triggers an event" do
+            last_event = engine_observer.last_event
 
-            event[:name].must_equal :game_started
-            event[:type].must_equal :continue_playing
+            last_event[:name].must_equal :game_started
+            last_event[:type].must_equal :continue_playing
           end
         end
 
@@ -288,43 +260,24 @@ module XO
 
           before { engine.stop }
 
-          it "changes state to :init" do
-            engine.state.must_equal :init
-          end
-
-          it "sets turn to :nobody" do
+          it "resets the game" do
             engine.turn.must_equal :nobody
+            engine.grid.must_be :empty?
           end
 
-          it "clears the grid" do
-            engine.grid.empty?.must_equal true
+          it "transitions to the Init state" do
+            engine.current_state.must_equal Init
           end
 
-          it "sets last event" do
-            event = engine.last_event
-
-            event[:name].must_equal :game_stopped
+          it "triggers an event" do
+            engine_observer.last_event[:name].must_equal :game_stopped
           end
         end
 
-        it "only allows #continue_playing and #stop to be called" do
-          proc { engine.start(Grid::X) }.must_raise Engine::IllegalStateError
-          proc { engine.play(1, 1) }.must_raise Engine::IllegalStateError
+        it "raises StateDesignPattern::IllegalStateException for the actions start and play" do
+          proc { engine.start(Grid::X) }.must_raise StateDesignPattern::IllegalStateException
+          proc { engine.play(1, 1) }.must_raise StateDesignPattern::IllegalStateException
         end
-      end
-    end
-
-    describe "#start with invalid input" do
-
-      it "raises an ArgumentError" do
-        proc { engine.start(:invalid_input) }.must_raise ArgumentError
-      end
-    end
-
-    describe "#continue_playing with invalid input" do
-
-      it "raises an ArgumentError" do
-        proc { engine.continue_playing(:invalid_input) }.must_raise ArgumentError
       end
     end
   end

@@ -41,13 +41,13 @@ module XO
     #
     #     { status: :invalid_grid, type: :two_winners }
     #
-    # Legend:
+    # *Legend:*
     #
-    # - :where is one of :row, :column, :diagonal
-    # - :index is one of 1, 2, 3 if :where is :row or :column and one of 1, 2 if :where is :diagonal
-    # - :positions is a 3 element array having the row, column values of the winning position
+    # - *:where* is one of :row, :column, :diagonal
+    # - *:index* is one of 1, 2, 3 if :where is :row or :column and one of 1, 2 if :where is :diagonal
+    # - *:positions* is a 3 element array having the row, column values of the winning position
     #
-    # Notice that the :details key is an array since it is possible to win a game in two different ways. For example:
+    # Notice that the :details key is an Array since it is possible to win a game in two different ways. For example:
     #
     #    x | o | x
     #   ---+---+---
